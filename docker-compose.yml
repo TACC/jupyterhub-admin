@@ -1,0 +1,10 @@
+version: "3"
+services:
+  jupyterhub_admin:
+    build: .
+    env_file:
+      - .env
+    ports:
+      - 8000:8000
+    container_name: jupyterhub_admin
+    command: [ "gunicorn", "--preload", "-w 4", "-b :8000",  "-t 200", "jupyterhub_admin.wsgi:application" ]
