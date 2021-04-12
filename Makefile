@@ -29,7 +29,7 @@ dev: build-dev
 
 # Running the pgrest/test.py file
 test:
-	@docker-compose run jupyterhub_admin python manage.py test
+	@docker-compose run jupyterhub_admin pytest
 
 
 # Pulls all Docker images not yet available but needed to run pgrest

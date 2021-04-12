@@ -21,10 +21,22 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/3.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-0uoh+7z0&u2!#oyc*ciyw7%dmjl&x@ls8)qsk%b3$)t!8g3dfj'
+SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', None) 
+if not SECRET_KEY:
+    raise Exception("Missing DJANGO_SECRET_KEY environment variable")
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.environ.get('DEBUG', False)
+
+# Token used for JupyterHub access
+JUPYTERHUB_TOKEN = os.environ.get('JUPYTERHUB_TOKEN', None)
+if not JUPYTERHUB_TOKEN:
+    raise Exception("Missing JUPYTERHUB_TOKEN environment variable")
+
+# API URL for JupyterHub
+JUPYTERHUB_API = os.environ.get('JUPYTERHUB_API', None)
+if not JUPYTERHUB_API:
+    raise Exception("Missing JUPYTERHUB_API environment variable")
 
 ALLOWED_HOSTS = ['*']
 
