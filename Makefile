@@ -27,9 +27,13 @@ dev: build-dev
 	@docker-compose -f docker-compose.dev.yml up
 
 
-# Running the pgrest/test.py file
-test:
-	@docker-compose run jupyterhub_admin pytest
+# Run unit tests on *unit_test.py
+unittest:
+	@docker-compose run jupyterhub_admin pytest -c unit_test.ini
+
+# Run integration tests on *integration_test.py
+integrationtest:
+	@docker-compose run jupyterhub_admin pytest -c integration_test.ini
 
 
 # Pulls all Docker images not yet available but needed to run pgrest
