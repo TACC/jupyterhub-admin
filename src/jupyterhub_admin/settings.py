@@ -17,7 +17,6 @@ import logging
 
 logger = logging.getLogger(__name__)
 
-
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -42,6 +41,20 @@ if not JUPYTERHUB_TOKEN:
 JUPYTERHUB_API = os.environ.get('JUPYTERHUB_API', None)
 if not JUPYTERHUB_API:
     logger.warning("Missing JUPYTERHUB_API environment variable")
+
+JUPYTERHUB_NAME = os.environ.get('JUPYTERHUB_NAME', None)
+if not JUPYTERHUB_API:
+    logger.warning("Missing JUPYTERHUB_NAME environment variable")
+
+# Agave API for Metadata
+AGAVE_API = os.environ.get('AGAVE_API', None)
+if not AGAVE_API:
+    logger.warning("Missing AGAVE_API environment variable")
+
+# Agave token for Jupyterh account
+AGAVE_TOKEN = os.environ.get('AGAVE_TOKEN', None)
+if not AGAVE_TOKEN:
+    logger.warning("Missing AGAVE_TOKEN environment variable")
 
 ALLOWED_HOSTS = ['*']
 

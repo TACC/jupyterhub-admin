@@ -42,6 +42,20 @@ JUPYTERHUB_API = 'JUPYTERHUB_API'
 if not JUPYTERHUB_API:
     logger.warning("Missing JUPYTERHUB_API environment variable")
 
+JUPYTERHUB_NAME = 'JUPYTERHUB_NAME'
+if not JUPYTERHUB_API:
+    logger.warning("Missing JUPYTERHUB_NAME environment variable")
+
+# Agave API for Metadata
+AGAVE_API = 'AGAVE_API'
+if not AGAVE_API:
+    logger.warning("Missing AGAVE_API environment variable")
+
+# Agave token for Jupyterh account
+AGAVE_TOKEN = 'AGAVE_TOKEN'
+if not AGAVE_TOKEN:
+    logger.warning("Missing AGAVE_TOKEN environment variable")
+
 ALLOWED_HOSTS = ['*']
 
 
