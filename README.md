@@ -11,4 +11,5 @@ Configuration settings are done via environment variables. Configuration is read
 A `Makefile` is available with the following commands:
 
 - `make dev`: runs a local development container with live reload
-- `make test`: runs tests
+- `make unittest`: runs unit tests
+- `make integrationtest`: runs integration tests using settings from `.env` against the JupyterHub and Agave Metadata
