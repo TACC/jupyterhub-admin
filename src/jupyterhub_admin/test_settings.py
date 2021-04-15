@@ -17,7 +17,6 @@ import logging
 
 logger = logging.getLogger(__name__)
 
-
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -26,7 +25,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/3.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', None) 
+SECRET_KEY = 'DJANGO_SECRET_KEY'
 if not SECRET_KEY:
     logger.warning("Missing DJANGO_SECRET_KEY environment variable")
 
@@ -34,12 +33,12 @@ if not SECRET_KEY:
 DEBUG = os.environ.get('DEBUG', False)
 
 # Token used for JupyterHub access
-JUPYTERHUB_TOKEN = os.environ.get('JUPYTERHUB_TOKEN', None)
+JUPYTERHUB_TOKEN = 'JUPYTERHUB_TOKEN'
 if not JUPYTERHUB_TOKEN:
     logger.warning("Missing JUPYTERHUB_TOKEN environment variable")
 
 # API URL for JupyterHub
-JUPYTERHUB_API = os.environ.get('JUPYTERHUB_API', None)
+JUPYTERHUB_API = 'JUPYTERHUB_API'
 if not JUPYTERHUB_API:
     logger.warning("Missing JUPYTERHUB_API environment variable")
 
