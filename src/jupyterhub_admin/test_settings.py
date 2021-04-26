@@ -25,7 +25,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/3.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', None) 
+SECRET_KEY = 'DJANGO_SECRET_KEY'
 if not SECRET_KEY:
     logger.warning("Missing DJANGO_SECRET_KEY environment variable")
 
@@ -33,26 +33,26 @@ if not SECRET_KEY:
 DEBUG = os.environ.get('DEBUG', False)
 
 # Token used for JupyterHub access
-JUPYTERHUB_TOKEN = os.environ.get('JUPYTERHUB_TOKEN', None)
+JUPYTERHUB_TOKEN = 'JUPYTERHUB_TOKEN'
 if not JUPYTERHUB_TOKEN:
     logger.warning("Missing JUPYTERHUB_TOKEN environment variable")
 
 # API URL for JupyterHub
-JUPYTERHUB_API = os.environ.get('JUPYTERHUB_API', None)
+JUPYTERHUB_API = 'JUPYTERHUB_API'
 if not JUPYTERHUB_API:
     logger.warning("Missing JUPYTERHUB_API environment variable")
 
-JUPYTERHUB_NAME = os.environ.get('JUPYTERHUB_NAME', None)
+JUPYTERHUB_NAME = 'JUPYTERHUB_NAME'
 if not JUPYTERHUB_API:
     logger.warning("Missing JUPYTERHUB_NAME environment variable")
 
 # Agave API for Metadata
-AGAVE_API = os.environ.get('AGAVE_API', None)
+AGAVE_API = 'AGAVE_API'
 if not AGAVE_API:
     logger.warning("Missing AGAVE_API environment variable")
 
 # Agave token for Jupyterh account
-AGAVE_TOKEN = os.environ.get('AGAVE_TOKEN', None)
+AGAVE_TOKEN = 'AGAVE_TOKEN'
 if not AGAVE_TOKEN:
     logger.warning("Missing AGAVE_TOKEN environment variable")
 
