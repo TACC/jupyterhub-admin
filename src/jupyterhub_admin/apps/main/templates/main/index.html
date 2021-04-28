@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %} Workbench {% endblock %}
+{% block head_extra %}
+  <base href="{% url 'main:index' %}">
+{% endblock %}
+{% block styles %}
+  <link rel="stylesheet" href="">
+  <link rel="stylesheet" href="">
+{% endblock %}
+{% block content %}
+<h1>Main Page</h1>
+{% endblock %}
+{% block scripts %}
+{% endblock %}

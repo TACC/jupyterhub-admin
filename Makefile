@@ -16,6 +16,7 @@ build-core:
 # Builds core locally and then runs pgrest in daemon mode
 local-deploy: build-core
 	@docker-compose run jupyterhub_admin python manage.py migrate
+	@docker-compose run jupyterhub_admin python manage.py collectstatic --no-input
 	@docker-compose up -d jupyterhub_admin
 
 build-dev:
@@ -24,6 +25,7 @@ build-dev:
 # Builds core locally and then runs pgrest in daemon mode
 dev: build-dev
 	@docker-compose -f docker-compose.dev.yml run jupyterhub_admin python manage.py migrate
+	@docker-compose -f docker-compose.dev.yml run jupyterhub_admin python manage.py collectstatic --no-input
 	@docker-compose -f docker-compose.dev.yml up
 
 
