@@ -9,7 +9,39 @@
   <link rel="stylesheet" href="">
 {% endblock %}
 {% block content %}
-<h3>JupyterHub Controls</h3>
+  <h3>
+    JupyterHub Servers
+  </h3>
+  {% if error == True %}
+    <h4>
+      Error retrieving JupyterHub servers
+    </h4>
+  {% else %}
+    <table border=1>
+      <thead>
+        <tr>
+          <th>
+            Username
+          </th>
+          <th>
+            Started
+          </th>
+          <th>
+            Last Activity
+          </th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for server in servers %}
+          <tr>
+            <td>{{ server.username }}</td>
+            <td>{{ server.started }}</td>
+            <td>{{ server.last_activity }}</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  {% endif %}
 {% endblock %}
 {% block scripts %}
 {% endblock %}
