@@ -19,12 +19,15 @@
   {% else %}
     <h4>Server info for {{ username }}</h4>
     {% if user.server %}
-    <dl>
-      <dt>Started</dt>
-      <dd>{{ user.started }}</dd>
-      <dt>Last Activity</dt>
-      <dd>{{ user.last_activity }}</dd>
-    </dl>
+      <dl>
+        <dt>Started</dt>
+        <dd>{{ user.server.started }}</dd>
+        <dt>Last Activity</dt>
+        <dd>{{ user.server.last_activity }}</dd>
+      </dl>
+    {% else %}
+      <i>Inactive</i>
+    {% endif %}
   {% endif %}
 {% endblock %}
 {% block scripts %}

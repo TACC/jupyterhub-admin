@@ -67,8 +67,8 @@ def user(request, username):
         'username': username
     }
     try:
-        contexet['user'] = user_context(parse_user(get_user(username)))
+        context['user'] = format_user(parse_user(get_user(username)))
     except Exception as e:
         context['error'] = True
         logger.exception()
-    return HttpResponse(username)
+    return HttpResponse(template.render(context, request))
