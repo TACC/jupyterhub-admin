@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %} Workbench {% endblock %}
+{% block head_extra %}
+  <base href="{% url 'main:index' %}">
+{% endblock %}
+{% block styles %}
+  <link rel="stylesheet" href="">
+  <link rel="stylesheet" href="">
+{% endblock %}
+{% block content %}
+  <h3>
+    JupyterHub Servers
+  </h3>
+  {% if error == True %}
+    <h4>
+      Error retrieving {{ username }} 
+    </h4>
+  {% else %}
+    <h4>Server info for {{ username }}</h4>
+    {% if user.server %}
+    <dl>
+      <dt>Started</dt>
+      <dd>{{ user.started }}</dd>
+      <dt>Last Activity</dt>
+      <dd>{{ user.last_activity }}</dd>
+    </dl>
+  {% endif %}
+{% endblock %}
+{% block scripts %}
+{% endblock %}

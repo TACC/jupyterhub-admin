@@ -25,12 +25,17 @@ def get_users():
     return jupyterhub_request('GET', '/users').json()
 
 
+def get_user(username):
+    return jupyterhub_request('GET', f'/users/{username}').json()
+
+
 def parse_user(user):
     """
     Parse a user object and dereference its server dictionary
     """
     result = user.copy()
     result['server'] = None
+    del result['servers']
     if has_server(user):
         result['server'] = list(user['servers'].items())[0][1]
     return result

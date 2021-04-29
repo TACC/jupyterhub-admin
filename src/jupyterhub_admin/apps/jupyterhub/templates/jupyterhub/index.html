@@ -21,22 +21,34 @@
       <thead>
         <tr>
           <th>
-            Username
+            Username<a href="{% url 'jupyterhub:index' %}">&#9660;</a>
           </th>
           <th>
-            Started
+            Started<a href="{% url 'jupyterhub:index' %}?sorting=started">&#9660;</a>
           </th>
           <th>
-            Last Activity
+            Last Activity<a href="{% url 'jupyterhub:index' %}?sorting=last_activity">&#9660;</a>
           </th>
         </tr>
       </thead>
       <tbody>
-        {% for server in servers %}
+        {% for user in users %}
           <tr>
-            <td><a href="{% url 'jupyterhub:user' username=server.username %}">{{ server.username }}</a></td>
-            <td>{{ server.started }}</td>
-            <td>{{ server.last_activity }}</td>
+            <td><a href="{% url 'jupyterhub:user' username=user.name %}">{{ user.name }}</a></td>
+            <td>
+              {% if user.server %}
+                {{ user.server.started }}
+              {% else %}
+                <i>Inactive</i>
+              {% endif %}
+            </td>
+            <td>
+              {% if user.server %}
+                {{ user.server.last_activity }}
+              {% else %}
+                <i>Inactive</i>
+              {% endif %}
+            </td>
           </tr>
         {% endfor %}
       </tbody>
