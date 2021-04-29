@@ -21,13 +21,28 @@
       <thead>
         <tr>
           <th>
-            Username<a href="{% url 'jupyterhub:index' %}">&#9660;</a>
+            Username
+            {% ifequal sorting None %}
+              &#9660;
+            {% else %}
+              <a href="{% url 'jupyterhub:index' %}">&#9660;</a>
+            {% endifequal %}
           </th>
           <th>
-            Started<a href="{% url 'jupyterhub:index' %}?sorting=started">&#9660;</a>
+            Started
+            {% ifequal sorting "started" %}
+              &#9660;
+            {% else %}
+              <a href="{% url 'jupyterhub:index' %}?sorting=started">&#9660;</a>
+            {% endifequal %}            
           </th>
           <th>
-            Last Activity<a href="{% url 'jupyterhub:index' %}?sorting=last_activity">&#9660;</a>
+            Last Activity
+            {% ifequal sorting "last_activity" %}
+              &#9660;
+            {% else %}
+              <a href="{% url 'jupyterhub:index' %}?sorting=last_activity">&#9660;</a>
+            {% endifequal %}
           </th>
         </tr>
       </thead>

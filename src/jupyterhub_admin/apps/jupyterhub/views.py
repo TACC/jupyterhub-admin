@@ -47,6 +47,7 @@ def index(request):
     sorting = request.GET.get('sorting', None)
     context = {
         'error': False,
+        'sorting': sorting,
         'users': []
     }
     try:
