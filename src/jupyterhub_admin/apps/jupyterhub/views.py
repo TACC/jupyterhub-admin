@@ -1,6 +1,6 @@
 from django.http import HttpResponse
 from django.template import loader
-from jupyterhub_admin.jhub_api import get_users
+from jupyterhub_admin.jhub_api import get_users, parse_user, has_server
 import dateutil.parser
 import logging
 
@@ -16,16 +16,15 @@ def index(request):
         'servers': []
     }
     try:
-        users = get_users()
+        print(get_users())
+        users = [ parse_user(user) for user in get_users() if has_server(user) ]
         for user in users:
-            servers = list(user['servers'].items())
-            if len(servers) > 0:
-                server = servers[0][1]
-                context['servers'].append({
-                    'username': user['name'],
-                    'started':  dateutil.parser.isoparse(server['started']).strftime(timeformat),
-                    'last_activity':  dateutil.parser.isoparse(server['last_activity']).strftime(timeformat)
-                })
+            server = user['server']
+            context['servers'].append({
+                'username': user['name'],
+                'started':  dateutil.parser.isoparse(server['started']).strftime(timeformat),
+                'last_activity':  dateutil.parser.isoparse(server['last_activity']).strftime(timeformat)
+            })
     except Exception as e:
         context['error'] = True
         logger.exception()

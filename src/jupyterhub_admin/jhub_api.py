@@ -23,3 +23,24 @@ def get_version():
 
 def get_users():
     return jupyterhub_request('GET', '/users').json()
+
+
+def parse_user(user):
+    """
+    Parse a user object and dereference its server dictionary
+    """
+    result = user.copy()
+    result['server'] = None
+    if has_server(user):
+        result['server'] = list(user['servers'].items())[0][1]
+    return result
+
+
+def has_server(user):
+    """
+    True if a user has an active server
+    """
+    try:
+        return len(list(user['servers'].items())) > 0
+    except:
+        return False
