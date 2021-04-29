@@ -34,7 +34,7 @@
       <tbody>
         {% for server in servers %}
           <tr>
-            <td>{{ server.username }}</td>
+            <td><a href="{% url 'jupyterhub:user' username=server.username %}">{{ server.username }}</a></td>
             <td>{{ server.started }}</td>
             <td>{{ server.last_activity }}</td>
           </tr>

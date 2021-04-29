@@ -30,3 +30,7 @@ def index(request):
         context['error'] = True
         logger.exception()
     return HttpResponse(template.render(context, request))
+
+
+def user(request, username):
+    return HttpResponse(username)
