@@ -3,6 +3,7 @@ from django.template import loader
 from jupyterhub_admin.jhub_api import (
     get_users,
     get_user,
+    stop_server,
     parse_user,
     has_server
 )
@@ -64,11 +65,20 @@ def user(request, username):
     template = loader.get_template("jupyterhub/user.html")
     context = {
         'error': False,
-        'username': username
+        'message': f'JupyterHub user {username}',
     }
+    if request.method == 'POST':
+        try:
+            result = stop_server(username)
+            print(result)
+        except Exception as e:
+            context['error'] = True
+            context['message'] = f'Failed to stop server for {username}'
+            logger.exception()
     try:
         context['user'] = format_user(parse_user(get_user(username)))
     except Exception as e:
         context['error'] = True
+        context['message'] = f'Unable to retrieve JupyterHub user information for {username}'
         logger.exception()
     return HttpResponse(template.render(context, request))

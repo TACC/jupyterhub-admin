@@ -14,10 +14,10 @@
   </h3>
   {% if error == True %}
     <h4>
-      Error retrieving {{ username }} 
+      {{ message }}
     </h4>
   {% else %}
-    <h4>Server info for {{ username }}</h4>
+    <h4>{{ message }}</h4>
     {% if user.server %}
       <dl>
         <dt>Started</dt>
@@ -25,6 +25,10 @@
         <dt>Last Activity</dt>
         <dd>{{ user.server.last_activity }}</dd>
       </dl>
+      <form method=POST action="{% url 'jupyterhub:user' username=user.name %}">
+        {% csrf_token %} 
+        <input type="submit" value="Stop Server"/>
+      </form>
     {% else %}
       <i>Inactive</i>
     {% endif %}

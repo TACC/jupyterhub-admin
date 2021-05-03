@@ -7,14 +7,13 @@ def jupyterhub_request(method, endpoint, data=None, params=None):
     headers = {
         'Authorization': 'token %s' % settings.JUPYTERHUB_TOKEN
     }
-    print(api_url)
-    print(headers)
+    print("API_URL", api_url)
     if method == 'POST':
         return requests.post(api_url, data=data, headers=headers)
     elif method == 'GET':
         return requests.get(api_url, params=params, headers=headers)
     elif method == 'DELETE':
-        return requests.get(api_url, params=params, headers=headers)
+        return requests.delete(api_url, params=params, headers=headers)
 
 
 def get_version():
@@ -27,6 +26,10 @@ def get_users():
 
 def get_user(username):
     return jupyterhub_request('GET', f'/users/{username}').json()
+
+
+def stop_server(username):
+    return jupyterhub_request('DELETE', f'/users/{username}/server')
 
 
 def parse_user(user):
