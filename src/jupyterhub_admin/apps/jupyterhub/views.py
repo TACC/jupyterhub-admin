@@ -67,14 +67,6 @@ def user(request, username):
         'error': False,
         'message': f'JupyterHub user {username}',
     }
-    if request.method == 'POST':
-        try:
-            result = stop_server(username)
-            print(result)
-        except Exception as e:
-            context['error'] = True
-            context['message'] = f'Failed to stop server for {username}'
-            logger.exception()
     try:
         context['user'] = format_user(parse_user(get_user(username)))
     except Exception as e:
@@ -82,3 +74,16 @@ def user(request, username):
         context['message'] = f'Unable to retrieve JupyterHub user information for {username}'
         logger.exception()
     return HttpResponse(template.render(context, request))
+
+
+def server(request, username):
+    if request.method == 'DELETE':
+        try:
+            logger.info(f"Stop server requested for {username}")
+            result = stop_server(username)
+            logger.info(f"Stop server successful for {username}")
+            return HttpResponse("OK")
+        except Exception as e:
+            logger.error(f"Stop server failed for {username}")
+            logger.exception()
+            return HttpResponse(status=500)

@@ -7,7 +7,6 @@ def jupyterhub_request(method, endpoint, data=None, params=None):
     headers = {
         'Authorization': 'token %s' % settings.JUPYTERHUB_TOKEN
     }
-    print("API_URL", api_url)
     if method == 'POST':
         return requests.post(api_url, data=data, headers=headers)
     elif method == 'GET':
