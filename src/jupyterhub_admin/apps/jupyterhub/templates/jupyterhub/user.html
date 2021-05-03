@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %} Workbench {% endblock %}
+{% block head_extra %}
+  <base href="{% url 'main:index' %}">
+{% endblock %}
+{% block styles %}
+  <link rel="stylesheet" href="">
+  <link rel="stylesheet" href="">
+{% endblock %}
+{% block content %}
+  <h3>
+    JupyterHub Servers
+  </h3>
+  {% if error == True %}
+    <h4>
+      {{ message }}
+    </h4>
+  {% else %}
+    <h4>{{ message }}</h4>
+    {% if user.server %}
+      <dl>
+        <dt>Started</dt>
+        <dd>{{ user.server.started }}</dd>
+        <dt>Last Activity</dt>
+        <dd>{{ user.server.last_activity }}</dd>
+      </dl>
+      <button id="stopServerButton">Stop Server</button>
+      <div class="spinner-border" role="status" id="stopServerSpinner">
+        <span class="sr-only">Loading...</span>
+      </div>
+      <div id="stopServerError">
+        Error while trying to stop server
+      </div>
+    {% else %}
+      <i>Inactive</i>
+    {% endif %}
+  {% endif %}
+{% endblock %}
+{% block scripts %}
+<script>
+  function stopServerSuccess(data, textStatus, jqXHR) {
+    console.log("stop server success", textStatus);
+    window.location.reload();
+  }
+  function stopServerError(jqXHR, textStatus, errorThrown) {
+    console.log("stop server error", errorThrown);
+    $("#stopServerError").show();
+  }
+  $(document).ajaxSend(function() {
+    $("#stopServerSpinner").show();
+    $("#stopServerError").hide();
+    $("#stopServerButton").prop("disabled", true);
+  });
+  $(document).ajaxStop(function() {
+    $("#stopServerSpinner").hide();
+    $("#stopServerButton").prop("disabled", false);
+  })
+  $(document).ready(function() {
+    $("#stopServerSpinner").hide();
+    $("#stopServerError").hide();
+    $("#stopServerButton").click(function() {
+      $.ajax(
+        "{% url 'jupyterhub:server' username=user.name %}",
+        {
+          method: 'DELETE',
+          headers: {'X-CSRFToken': '{{ csrf_token }}'},
+          success: stopServerSuccess,
+          error: stopServerError
+        }
+      )
+    });
+  });
+</script>
+{% endblock %}

@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %} Workbench {% endblock %}
+{% block head_extra %}
+  <base href="{% url 'main:index' %}">
+{% endblock %}
+{% block styles %}
+  <link rel="stylesheet" href="">
+  <link rel="stylesheet" href="">
+{% endblock %}
+{% block content %}
+  <h3>
+    JupyterHub Servers
+  </h3>
+  {% if error == True %}
+    <h4>
+      Error retrieving JupyterHub servers
+    </h4>
+  {% else %}
+    <table border=1>
+      <thead>
+        <tr>
+          <th>
+            Username
+            {% ifequal sorting None %}
+              &#9660;
+            {% else %}
+              <a href="{% url 'jupyterhub:index' %}">&#9660;</a>
+            {% endifequal %}
+          </th>
+          <th>
+            Started
+            {% ifequal sorting "started" %}
+              &#9660;
+            {% else %}
+              <a href="{% url 'jupyterhub:index' %}?sorting=started">&#9660;</a>
+            {% endifequal %}            
+          </th>
+          <th>
+            Last Activity
+            {% ifequal sorting "last_activity" %}
+              &#9660;
+            {% else %}
+              <a href="{% url 'jupyterhub:index' %}?sorting=last_activity">&#9660;</a>
+            {% endifequal %}
+          </th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for user in users %}
+          <tr>
+            <td><a href="{% url 'jupyterhub:user' username=user.name %}">{{ user.name }}</a></td>
+            <td>
+              {% if user.server %}
+                {{ user.server.started }}
+              {% else %}
+                <i>Inactive</i>
+              {% endif %}
+            </td>
+            <td>
+              {% if user.server %}
+                {{ user.server.last_activity }}
+              {% else %}
+                <i>Inactive</i>
+              {% endif %}
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  {% endif %}
+{% endblock %}
+{% block scripts %}
+{% endblock %}

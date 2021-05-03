@@ -20,7 +20,6 @@ logger = logging.getLogger(__name__)
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/3.2/howto/deployment/checklist/
 
@@ -59,6 +58,17 @@ if not AGAVE_TOKEN:
 ALLOWED_HOSTS = ['*']
 
 
+STATIC_URL = '/static/'
+MEDIA_URL = '/media/'
+
+STATIC_ROOT = os.path.join(BASE_DIR, 'static')
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
+STATICFILES_FINDERS = [
+    'django.contrib.staticfiles.finders.FileSystemFinder',
+    'django.contrib.staticfiles.finders.AppDirectoriesFinder',
+]
+
 # Application definition
 
 INSTALLED_APPS = [
@@ -68,6 +78,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'jupyterhub_admin.apps.jupyterhub',
+    'jupyterhub_admin.apps.main'
 ]
 
 MIDDLEWARE = [
@@ -85,7 +97,7 @@ ROOT_URLCONF = 'jupyterhub_admin.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [os.path.join(BASE_DIR, 'jupyterhub_admin/templates')],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
