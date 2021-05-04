@@ -10,7 +10,7 @@
 {% endblock %}
 {% block content %}
   <h3>
-    JupyterHub Image
+    JupyterHub Image Configuration
   </h3>
   {% if error == True %}
     <h4>
@@ -18,55 +18,66 @@
     </h4>
   {% else %}
     <h4>{{ message }}</h4>
-    {% if user.server %}
-      <dl>
-        <dt>Started</dt>
-        <dd>{{ user.server.started }}</dd>
-        <dt>Last Activity</dt>
-        <dd>{{ user.server.last_activity }}</dd>
-      </dl>
-      <button id="stopServerButton">Stop Server</button>
-      <div class="spinner-border" role="status" id="stopServerSpinner">
-        <span class="sr-only">Loading...</span>
-      </div>
-      <div id="stopServerError">
-        Error while trying to stop server
-      </div>
-    {% else %}
-      <i>Inactive</i>
-    {% endif %}
+    <div class="form-group" for="display_name">
+      <label>Display Name</label>
+      <input 
+        id="display_name"
+        class="form-control"
+        type="text"
+        value="{{ image.display_name }}"
+        placeholder="Display name for the image"/>
+    </div>
+    <div class="form-group" for="image_name">
+      <label>Image Name</label>
+      <input
+        id="image_name"
+        class="form-control"
+        type="text"
+        value="{{ image.name }}"
+        placeholder="DockerHub image name" />
+    </div>
+    <button type="submit" class="btn btn-primary" id="submitImageButton">Submit</button>
+    <div class="spinner-border" role="status" id="submitImageSpinner">
+      <span class="sr-only">Loading...</span>
+    </div>
+    <div id="submitImageError">
+      Error trying to save image configuration
+    </div>
   {% endif %}
 {% endblock %}
 {% block scripts %}
 <script>
-  function stopServerSuccess(data, textStatus, jqXHR) {
-    console.log("stop server success", textStatus);
+  function imageSubmitSuccess(data, textStatus, jqXHR) {
     window.location.reload();
   }
-  function stopServerError(jqXHR, textStatus, errorThrown) {
-    console.log("stop server error", errorThrown);
-    $("#stopServerError").show();
+  function imageSubmitFailure(jqXHR, textStatus, errorThrown) {
+    $("#imageSubmitError").show();
   }
   $(document).ajaxSend(function() {
-    $("#stopServerSpinner").show();
-    $("#stopServerError").hide();
-    $("#stopServerButton").prop("disabled", true);
+    $("#submitImageSpinner").show();
+    $("#submitImageError").hide();
+    $("#submitImageButton").prop("disabled", true);
   });
   $(document).ajaxStop(function() {
-    $("#stopServerSpinner").hide();
-    $("#stopServerButton").prop("disabled", false);
+    $("#submitImageSpinner").hide();
+    $("#submitImageButton").prop("disabled", false);
   })
   $(document).ready(function() {
-    $("#stopServerSpinner").hide();
-    $("#stopServerError").hide();
-    $("#stopServerButton").click(function() {
+    $("#submitImageSpinner").hide();
+    $("#submitImageError").hide();
+    $("#submitImageButton").click(function() {
       $.ajax(
-        "{% url 'jupyterhub:server' username=user.name %}",
+        "{% url 'images:api' %}",
         {
-          method: 'DELETE',
+          method: 'POST',
           headers: {'X-CSRFToken': '{{ csrf_token }}'},
-          success: stopServerSuccess,
-          error: stopServerError
+          data: {
+            image_name: $("#image_name").val(),
+            display_name: $("#display_name").val(),
+            index: "{{ index }}"
+          },
+          success: imageSubmitSuccess,
+          error: imageSubmitFailure
         }
       )
     });

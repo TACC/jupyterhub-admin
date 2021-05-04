@@ -4,5 +4,6 @@ from . import views
 app_name = 'images'
 urlpatterns = [
     path('', views.index, name='index'),
-    path('images/<int:index>', views.image, name='image')
+    path('<int:index>', views.images, name='images'),
+    path('api/', views.api, name='api')
 ]

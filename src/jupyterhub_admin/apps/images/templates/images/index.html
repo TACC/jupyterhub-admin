@@ -14,7 +14,7 @@
   </h3>
   {% if error == True %}
     <h4>
-      Error retrieving JupyterHub Images Metadata
+      {{ message }}
     </h4>
   {% else %}
     <table border=1>
@@ -28,7 +28,7 @@
         {% for image in images %}
           <tr>
             <td>
-              <a href="{% url 'images:image' index=forloop.counter0 %}">
+              <a href="{% url 'images:images' index=forloop.counter0 %}">
                 {{ image.display_name }}
               </a>
             </td>
