@@ -20,5 +20,6 @@ from django.urls import include, path
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('jhub/', include('jupyterhub_admin.apps.jupyterhub.urls')),
+    path('images/', include('jupyterhub_admin.apps.images.urls')),
     path('', include('jupyterhub_admin.apps.main.urls'))
 ]
