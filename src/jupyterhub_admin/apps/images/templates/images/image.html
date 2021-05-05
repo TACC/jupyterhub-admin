@@ -48,10 +48,10 @@
 {% block scripts %}
 <script>
   function imageSubmitSuccess(data, textStatus, jqXHR) {
-    window.location.reload();
+    window.location.assign("{% url 'images:index' %}");
   }
   function imageSubmitFailure(jqXHR, textStatus, errorThrown) {
-    $("#imageSubmitError").show();
+    $("#submitImageError").show();
   }
   $(document).ajaxSend(function() {
     $("#submitImageSpinner").show();

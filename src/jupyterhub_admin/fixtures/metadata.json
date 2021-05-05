@@ -1,0 +1,55 @@
+{
+  "uuid": "8231325922393068011-242ac113-0001-012",
+  "schemaId": null,
+  "internalUsername": null,
+  "associationIds": [],
+  "lastUpdated": "2021-04-22T10:50:16.949-05:00",
+  "name": "config.jchuah.dev.jhub",
+  "value": {
+    "tenant": "jchuah",
+    "instance": "dev",
+    "volume_mounts": [],
+    "images": [
+      {
+        "name": "taccsciapps/jupyteruser-tc:1.1.0",
+        "display_name": "Default Settings"
+      }
+    ],
+    "mem_limit": "3G",
+    "cpu_limit": "3",
+    "oauth_callback_url": "https://jchuah.io.jupyter.tacc.cloud/hub/oauth_callback",
+    "oauth_validate_cert": "True",
+    "agave_client_id": "AGAVE_CLIENT_ID",
+    "agave_client_secret": "AGAVE_CLIENT_SECRET",
+    "agave_base_url": "https://api.tacc.utexas.edu",
+    "agave_tenant_id": "tacc",
+    "agave_login_button_text": "Jupyterhub",
+    "extra_pod_config": {
+      "nodeSelector": {
+        "haswork": "true"
+      }
+    },
+    "config_type": "tenant",
+    "services": [
+      {
+        "name": "service-token",
+        "admin": true,
+        "api_token": "API_TOKEN"
+      }
+    ]
+  },
+  "created": "2021-04-21T10:15:45.924-05:00",
+  "owner": "jupyterh",
+  "_links": {
+    "self": {
+      "href": "https://api.tacc.utexas.edu/meta/v2/data/8231325922393068011-242ac113-0001-012"
+    },
+    "permissions": {
+      "href": "https://api.tacc.utexas.edu/meta/v2/data/8231325922393068011-242ac113-0001-012/pems"
+    },
+    "owner": {
+      "href": "https://api.tacc.utexas.edu/profiles/v2/jupyterh"
+    },
+    "associationIds": []
+  }
+}
