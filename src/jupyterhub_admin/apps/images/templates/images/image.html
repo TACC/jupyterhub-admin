@@ -36,7 +36,10 @@
         value="{{ image.name }}"
         placeholder="DockerHub image name" />
     </div>
-    <button type="submit" class="btn btn-primary" id="submitImageButton">Submit</button>
+    <button type="submit" class="btn btn-primary" id="submitImageButton">Save</button>
+    {% if index != 'new' %}
+      <button type="submit" class="btn btn-danger" id="deleteImageButton">Delete</button>
+    {% endif %}
     <div class="spinner-border" role="status" id="submitImageSpinner">
       <span class="sr-only">Loading...</span>
     </div>
@@ -48,39 +51,75 @@
 {% block scripts %}
 <script>
   function imageSubmitSuccess(data, textStatus, jqXHR) {
+    // Upon successfully saving an image, redirect back to images list
     window.location.assign("{% url 'images:index' %}");
   }
+
   function imageSubmitFailure(jqXHR, textStatus, errorThrown) {
+    // Upon failing to save or delete an image, show the error
     $("#submitImageError").show();
   }
+
+  function validate() {
+    // Validate inputs
+    const display_name = $("#display_name").val();
+    const image_name = $("#image_name").val();
+    const re = RegExp("^(?:(?=[^:\/]{1,253})(?!-)[a-zA-Z0-9-]{1,63}(?<!-)(?:\.(?!-)[a-zA-Z0-9-]{1,63}(?<!-))*(?::[0-9]{1,5})?/)?((?![._-])(?:[a-z0-9._-]*)(?<![._-])(?:/(?![._-])[a-z0-9._-]*(?<![._-]))*)(?::(?![.-])[a-zA-Z0-9_.-]{1,128})?");
+    if (display_name && display_name.length > 0 && image_name && re.test(image_name)) {
+      $("#submitImageButton").prop("disabled", false);
+    } else {
+      $("#submitImageButton").prop("disabled", true);
+    }
+  }
+
+  function saveImage() {
+    $.ajax(
+      "{% url 'images:api' %}",
+      {
+        method: 'POST',
+        headers: {'X-CSRFToken': '{{ csrf_token }}'},
+        data: {
+          image_name: $("#image_name").val(),
+          display_name: $("#display_name").val(),
+          index: "{{ index }}"
+        },
+        success: imageSubmitSuccess,
+        error: imageSubmitFailure
+      }
+    )
+  }
+
   $(document).ajaxSend(function() {
+    // Before sending any ajax calls, show the loading spinner and disable buttons
     $("#submitImageSpinner").show();
     $("#submitImageError").hide();
+    $("#deleteImageButton").prop("disabled", true);
     $("#submitImageButton").prop("disabled", true);
   });
+
   $(document).ajaxStop(function() {
+    // After sending ajax calls, hide the loading spinner and enable buttons
     $("#submitImageSpinner").hide();
+    $("#deleteImageButton").prop("disabled", false);
     $("#submitImageButton").prop("disabled", false);
   })
+
   $(document).ready(function() {
+    // Bind validation function for input changes
+    $("#display_name").change(validate);
+    $("#display_name").keyup(validate);
+    $("#image_name").change(validate);
+    $("#image_name").keyup(validate);
+
+    // Hide loading spinner and errors
     $("#submitImageSpinner").hide();
     $("#submitImageError").hide();
-    $("#submitImageButton").click(function() {
-      $.ajax(
-        "{% url 'images:api' %}",
-        {
-          method: 'POST',
-          headers: {'X-CSRFToken': '{{ csrf_token }}'},
-          data: {
-            image_name: $("#image_name").val(),
-            display_name: $("#display_name").val(),
-            index: "{{ index }}"
-          },
-          success: imageSubmitSuccess,
-          error: imageSubmitFailure
-        }
-      )
-    });
+
+    // Set initial state of submit button to disabled
+    $("#submitImageButton").prop("disabled", true);
+
+    // Bind callbacks to buttons
+    $("#submitImageButton").click(saveImage);
   });
 </script>
 {% endblock %}

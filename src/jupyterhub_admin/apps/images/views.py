@@ -22,6 +22,7 @@ def index(request):
         logger.exception()
     return HttpResponse(template.render(context, request))
 
+
 def images(request, index):
     template = loader.get_template("images/image.html")
     context = {
@@ -36,6 +37,21 @@ def images(request, index):
         context['error'] = True
         context['message'] = 'Could not retrieve JupyterHub Image'
         logger.exception()
+    return HttpResponse(template.render(context, request))
+
+
+def new_image(request):
+    template = loader.get_template("images/image.html")
+    context = {
+        'error': False,
+        'index': 'new'
+    }
+    metadata = get_config_metadata()
+    context['image'] = {
+        'display_name': '',
+        'image_name': ''
+    }
+    context['message'] = f"Add a new JupyterHub Image" 
     return HttpResponse(template.render(context, request))
 
 
