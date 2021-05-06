@@ -10,12 +10,12 @@ def metadata():
       'value': {
           'images': [
               {
-                  'display_name': "Image 1",
-                  'name': 'org/repo1:tag'
+                  'display_name': "Image 0",
+                  'name': 'org/repo0:tag'
               },
               {
-                  'display_name': "Image 2",
-                  'name': 'org/repo2:tag'
+                  'display_name': "Image 1",
+                  'name': 'org/repo1:tag'
               }
           ]
       }
@@ -46,5 +46,16 @@ def test_index(client, template_render, get_config_metadata, metadata):
         'error': False,
         'images': metadata['value']['images']
     }
-    response = client.get('/images/', follow_redirect=True)
+    response = client.get('/images/')
+    template_render.assert_called_with(context, ANY)
+
+
+def test_image(client, template_render, get_config_metadata, metadata):
+    context = {
+        'error': False,
+        'index': 1,
+        'image': metadata['value']['images'][1],
+        'message': "Configuration for Image 1"
+    }
+    response = client.get('/images/1')
     template_render.assert_called_with(context, ANY)
