@@ -44,13 +44,13 @@ def new_image(request):
     template = loader.get_template("images/image.html")
     context = {
         'error': False,
-        'index': 'new'
+        'index': 'new',
+        'image': {
+            'display_name': '',
+            'image_name': ''
+        },
+        'message': f"Add a new JupyterHub Image"
     }
-    context['image'] = {
-        'display_name': '',
-        'image_name': ''
-    }
-    context['message'] = f"Add a new JupyterHub Image" 
     return HttpResponse(template.render(context, request))
 
 
