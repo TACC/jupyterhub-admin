@@ -50,7 +50,7 @@ def test_index(client, template_render, get_config_metadata, metadata):
     template_render.assert_called_with(context, ANY)
 
 
-def test_image(client, template_render, get_config_metadata, metadata):
+def test_images(client, template_render, get_config_metadata, metadata):
     context = {
         'error': False,
         'index': 1,
@@ -59,3 +59,33 @@ def test_image(client, template_render, get_config_metadata, metadata):
     }
     response = client.get('/images/1')
     template_render.assert_called_with(context, ANY)
+
+
+def test_api_post(client, get_config_metadata, write_config_metadata, metadata):
+    data = {
+        'display_name': 'Image 2',
+        'name': 'org/repo2:tag'
+    }
+    expected = metadata['value'].copy()
+    expected['images'][1] = data
+    response = client.post('/images/api/1', data=data)
+    assert response.status_code == 200
+    write_config_metadata.assert_called_with(expected)
+
+
+def test_api_new(client, get_config_metadata, write_config_metadata, metadata):
+    data = {
+        'display_name': 'Image 2',
+        'name': 'org/repo2:tag'
+    }
+    expected = metadata['value'].copy()
+    expected['images'].append(data)
+    response = client.post('/images/api/new', data=data)
+    assert response.status_code == 200
+    write_config_metadata.assert_called_with(expected)
+
+
+def test_api_delete(client, get_config_metadata, write_config_metadata, metadata):
+    response = client.delete('/images/api/1')
+    assert response.status_code == 200
+    write_config_metadata.assert_called_with({'images': [{'display_name': 'Image 0', 'name': 'org/repo0:tag'}]})

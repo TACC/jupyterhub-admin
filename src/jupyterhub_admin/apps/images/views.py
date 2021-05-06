@@ -19,7 +19,7 @@ def index(request):
     except Exception as e:
         context['error'] = True
         context['message'] = 'Image configuration could not be retrieved'
-        logger.exception()
+        logger.exception(e)
     return HttpResponse(template.render(context, request))
 
 
@@ -36,7 +36,7 @@ def images(request, index):
     except Exception as e:
         context['error'] = True
         context['message'] = 'Could not retrieve JupyterHub Image'
-        logger.exception()
+        logger.exception(e)
     return HttpResponse(template.render(context, request))
 
 
@@ -68,11 +68,11 @@ def api(request, index):
                 metadata['value']['images'].append(image)
             else:
                 index = int(index)
-                metadata['value']['images'][index] = (image)
+                metadata['value']['images'][index] = image
             write_config_metadata(metadata['value'])
             return HttpResponse("OK")
         except Exception as e:
-            logger.exception()
+            logger.exception(e)
             return HttpResponse(status=500)
     
     if request.method == 'DELETE':
@@ -83,6 +83,6 @@ def api(request, index):
             write_config_metadata(metadata['value'])
             return HttpResponse("OK")
         except Exception as e:
-            logger.exception()
+            logger.exception(e)
             return HttpResponse(status=500)
             
