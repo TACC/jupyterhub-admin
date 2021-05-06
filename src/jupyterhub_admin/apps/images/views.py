@@ -46,7 +46,6 @@ def new_image(request):
         'error': False,
         'index': 'new'
     }
-    metadata = get_config_metadata()
     context['image'] = {
         'display_name': '',
         'image_name': ''
