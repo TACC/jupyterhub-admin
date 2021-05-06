@@ -55,9 +55,8 @@ def new_image(request):
     return HttpResponse(template.render(context, request))
 
 
-def api(request):
+def api(request, index):
     if request.method == 'POST':
-        index = request.POST.get('index')
         display_name = request.POST.get('display_name')
         image_name = request.POST.get('image_name')
         try:
@@ -71,6 +70,17 @@ def api(request):
             else:
                 index = int(index)
                 metadata['value']['images'][index] = (image)
+            write_config_metadata(metadata['value'])
+            return HttpResponse("OK")
+        except Exception as e:
+            logger.exception()
+            return HttpResponse(status=500)
+    
+    if request.method == 'DELETE':
+        try:
+            index = int(index)
+            metadata = get_config_metadata()
+            metadata['value']['images'].pop(index)
             write_config_metadata(metadata['value'])
             return HttpResponse("OK")
         except Exception as e:

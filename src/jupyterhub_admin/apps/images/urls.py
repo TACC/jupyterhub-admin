@@ -6,5 +6,5 @@ urlpatterns = [
     path('', views.index, name='index'),
     path('<int:index>', views.images, name='images'),
     path('new/', views.new_image, name='new'),
-    path('api/', views.api, name='api')
+    path('api/<str:index>', views.api, name='api')
 ]
