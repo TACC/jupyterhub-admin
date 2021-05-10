@@ -32,7 +32,7 @@ def test_get_write_config_metadata(mocker, mock_agave):
     })
     write_config_metadata({ 'key': 'value' })
     mock_agave.return_value.meta.updateMetadata.assert_called_with(
-        body='{"key": "value"}',
+        body={'uuid': 'MOCK_UUID', 'value': {'key': 'value'}},
         uuid='MOCK_UUID'
     )
 

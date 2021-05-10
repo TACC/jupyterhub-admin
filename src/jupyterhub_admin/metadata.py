@@ -19,8 +19,9 @@ def get_config_metadata():
 
 def write_config_metadata(value):
     ag = Agave(api_server=settings.AGAVE_API, token=settings.AGAVE_TOKEN)
-    original = get_config_metadata()
-    ag.meta.updateMetadata(body=json.dumps(value), uuid=original['uuid'])
+    meta = get_config_metadata()
+    meta['value'] = value
+    ag.meta.updateMetadata(body=meta, uuid=meta['uuid'])
 
 
 def set_config(key, value):
