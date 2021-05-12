@@ -114,11 +114,12 @@ def api(request, index):
     if request.method == 'POST':
         try:
             metadata = get_config_metadata()
+            print(request.POST.get('read_only'))
             mount = {
                 'type': request.POST.get('mount_type'),
                 'path': request.POST.get('path'),
                 'mountPath': request.POST.get('mount_path'),
-                'readOnly': "True" if request.POST.get('read_only') else "False"
+                'readOnly': "True" if request.POST.get('read_only') == 'true' else "False"
             }
             if (mount['type'] == 'nfs'):
                 mount['server'] = request.POST.get('server')
