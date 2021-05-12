@@ -60,14 +60,12 @@ def test_images(client, template_render, get_config_metadata, metadata):
                 'label': 'Display Name',
                 'id': 'display_name',
                 'value': 'Image 1',
-                'type': 'text',
                 'placeholder': 'Name of the image to display in the spawner'
             },
             {
                 'label': 'Image Name',
                 'id': 'image_name',
                 'value': 'org/repo1:tag',
-                'type': 'text',
                 'placeholder': 'Image repository, name and tag'
             }
         ],

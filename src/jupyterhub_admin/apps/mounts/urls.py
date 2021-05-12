@@ -4,7 +4,7 @@ from . import views
 app_name = 'mounts'
 urlpatterns = [
     path('', views.index, name='index'),
-    path('<int:index>', views.images, name='images'),
-    path('new/', views.new_image, name='new'),
+    path('<int:index>', views.mounts, name='images'),
+    path('new/', views.new_mount, name='new'),
     path('api/<str:index>', views.api, name='api')
 ]

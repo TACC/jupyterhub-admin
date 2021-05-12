@@ -15,12 +15,14 @@ def get_fields(image=None):
             'label': 'Display Name',
             'id': 'display_name',
             'value': '' if not image else image['display_name'],
+            'type': 'text',
             'placeholder': "Name of the image to display in the spawner"
         },
         {
             'label': 'Image Name',
             'id': 'image_name',
             'value': '' if not image else image['name'],
+            'type': 'text',
             'placeholder': "Image repository, name and tag"
         }
     ]
@@ -70,10 +72,6 @@ def new_image(request):
         'error': False,
         'index': 'new',
         'fields': get_fields(),
-        'image': {
-            'display_name': '',
-            'image_name': ''
-        },
         'api': reverse('images:api', args=["new"]),
         'header': f"JupyterHub Image Configuration",
         'message': f"Add a new JupyterHub Image",

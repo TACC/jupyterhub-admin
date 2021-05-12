@@ -17,14 +17,33 @@
     <h4>{{ message }}</h4>
     <div id="formBlock">
       {% for field in fields %}
-        <div class="form-group" for="display_name">
+        <div class="form-group" for="{{ field.id }}"></div>
           <label>{{ field.label }}</label>
-          <input 
-            id="{{ field.id }}"
-            class="form-control"
-            type="text"
-            value="{{ field.value }}"
-            placeholder="{{ field.placeholder }}"/>
+          {% if field.type == 'text' %}
+            <input 
+              id="{{ field.id }}"
+              class="form-control"
+              type="text"
+              value="{{ field.value }}"
+              placeholder="{{ field.placeholder }}"/>
+          {% endif %}
+          {% if field.type == 'checkbox' %}
+            <input 
+              id="{{ field.id }"
+              class="form-control"
+              type="checkbox"
+              value="{{ field.value }}"
+            />
+          {% endif %}
+          {% if field.type == 'select' %}
+            <select class="form-select" id="{{ field.id }}" value="{{ field.value }}">
+              {% for option in field.options %}
+                <option value="{{ option }}">
+                  {{ option }}
+                </option>
+              {% endfor %}
+            </select>
+          {% endif %}
         </div>
       {% endfor %}
     </div>

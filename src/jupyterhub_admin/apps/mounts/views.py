@@ -1,75 +1,132 @@
 from django.http import HttpResponse
 from django.template import loader
+from django.urls import reverse
 from jupyterhub_admin.metadata import get_config_metadata, write_config_metadata
 import logging
+import copy
 
 
 logger = logging.getLogger(__name__)
+
+
+def get_fields(mount=None):
+    return [
+        {
+            'label': 'Mount Type',
+            'id': 'mount_type',
+            'value': 'hostPath' if not mount else mount['type'],
+            'type': 'select',
+            'options': ['hostPath', 'nfs'],
+            'placeholder': 'The type of file system mount'
+        },
+        {
+            'label': 'Remote Server',
+            'id': 'server',
+            'value': '' if not mount or not mount['server'] else mount['server'],
+            'type': 'text',
+            'placeholder': 'The hostname of the remote server for this mount'
+        },
+        {
+            'label': 'Path',
+            'id': 'path',
+            'type': 'text',
+            'value': '' if not mount else mount['path'],
+            'placeholder': 'The path on the JupyterHub host',
+        },
+        {
+            'label': 'Mount Path',
+            'id': 'mount_path',
+            'value': '' if not mount or not mount['mountPath'] else mount['mountPath'],
+            'type': 'text',
+            'placeholder': 'The path for this mount on the Jupyter server'
+        },
+        {
+            'label': 'Read Only',
+            'id': 'read_only',
+            'value': True if not mount else mount['readOnly'] == "True",
+            'type': 'checkbox',
+            'placeholder': 'If true, the server will not allow notebook writes to this path'
+        }
+    ]
 
 
 def index(request):
     template = loader.get_template("mounts/index.html")
     context = {
         'error': False,
-        'mounts': []
+        'images': []
     }
     try:
         metadata = get_config_metadata()
         context['mounts'] = metadata['value']['volume_mounts']
     except Exception as e:
         context['error'] = True
-        context['message'] = 'Volume mount configuration could not be retrieved'
+        context['message'] = 'Mount configuration could not be retrieved'
         logger.exception(e)
     return HttpResponse(template.render(context, request))
 
 
-def images(request, index):
-    template = loader.get_template("images/image.html")
+def mounts(request, index):
+    template = loader.get_template("mounts/mount.html")
     context = {
         'error': False,
-        'index': index
+        'index': index,
+        'header': "JupyterHub Mount Configuration",
+        'fields': [],
+        'api': reverse('mounts:api', args=[str(index)])
     }
     try:
-        metadata = get_config_metadata()
-        context['image'] = metadata['value']['images'][index]
-        context['message'] = f"Configuration for {context['image']['display_name']}" 
+        #metadata = get_config_metadata()
+        #mount = metadata['value']['volume_mounts'][index]
+        mount = {
+            "type": "nfs",
+            "server": "c3-dtn03.corral.tacc.utexas.edu",
+            "path": "/gpfs/corral3/repl/projects/NHERI/published/PRJ-2487",
+            "mountPath": "/home/jupyter/NHERI-Published/PRJ-2487",
+            "readOnly": "True"
+        }
+        context['fields'] = get_fields(mount)
+        context['message'] = f"Configuration for {mount['mountPath']}" 
+        context['delete_confirmation'] = f"{mount['mountPath']}"
     except Exception as e:
         context['error'] = True
-        context['message'] = 'Could not retrieve JupyterHub Image'
+        context['message'] = 'Could not retrieve JupyterHub Volume Mount'
         logger.exception(e)
     return HttpResponse(template.render(context, request))
 
 
-def new_image(request):
-    template = loader.get_template("images/image.html")
+def new_mount(request):
+    template = loader.get_template("mounts/mount.html")
     context = {
         'error': False,
         'index': 'new',
-        'image': {
-            'display_name': '',
-            'image_name': ''
-        },
-        'message': f"Add a new JupyterHub Image"
+        'fields': get_fields(),
+        'api': reverse('mounts:api', args=["new"]),
+        'header': f"JupyterHub Volume Mount Configuration",
+        'message': f"Add a new JupyterHub Volume Mount",
     }
     return HttpResponse(template.render(context, request))
 
 
 def api(request, index):
     if request.method == 'POST':
-        display_name = request.POST.get('display_name')
-        image_name = request.POST.get('image_name')
         try:
             metadata = get_config_metadata()
-            image = {
-                'display_name': display_name,
-                'name': image_name
+            mount = {
+                'type': request.POST.get('mount_type'),
+                'path': request.POST.get('path'),
+                'mountPath': request.POST.get('mount_path'),
+                'readOnly': "True" if request.POST.get('read_only') else "False"
             }
+            if (mount['type'] == 'nfs'):
+                mount['server'] = request.POST.get('server')
             if index == 'new':
-                metadata['value']['images'].append(image)
+                metadata['value']['volume_mounts'].append(image)
             else:
                 index = int(index)
-                metadata['value']['images'][index] = image
-            write_config_metadata(metadata['value'])
+                metadata['value']['volume_mounts'][index] = mount
+            print(mount)
+            #write_config_metadata(metadata['value'])
             return HttpResponse("OK")
         except Exception as e:
             logger.exception(e)
@@ -79,7 +136,7 @@ def api(request, index):
         try:
             index = int(index)
             metadata = get_config_metadata()
-            metadata['value']['images'].pop(index)
+            metadata['value']['volume_mounts'].pop(index)
             write_config_metadata(metadata['value'])
             return HttpResponse("OK")
         except Exception as e:
