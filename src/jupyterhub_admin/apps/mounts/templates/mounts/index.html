@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %} Workbench {% endblock %}
+{% block head_extra %}
+  <base href="{% url 'main:index' %}">
+{% endblock %}
+{% block styles %}
+  <link rel="stylesheet" href="">
+  <link rel="stylesheet" href="">
+{% endblock %}
+{% block content %}
+  <h3>
+    JupyterHub Images
+  </h3>
+  {% if error == True %}
+    <h4>
+      {{ message }}
+    </h4>
+  {% else %}
+    <table border=1>
+      <thead>
+        <tr>
+          <th>Display Name</th>
+          <th>Image Name</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for mount in mounts %}
+          <tr>
+            <td>
+              <a href="{% url 'mounts:mounts' index=forloop.counter0 %}">
+                {{ mount.display_name }}
+              </a>
+            </td>
+            <td>
+              {{ mount.name }}
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    <br />
+    <a class="btn btn-primary" href="{% url 'mounts:new' %}">+ New Image</a>
+  {% endif %}
+{% endblock %}
+{% block scripts %}
+{% endblock %}

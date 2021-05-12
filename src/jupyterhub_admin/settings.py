@@ -80,7 +80,8 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'jupyterhub_admin.apps.jupyterhub',
     'jupyterhub_admin.apps.main',
-    'jupyterhub_admin.apps.images'
+    'jupyterhub_admin.apps.images',
+    'jupyterhub_admin.apps.mounts'
 ]
 
 MIDDLEWARE = [
