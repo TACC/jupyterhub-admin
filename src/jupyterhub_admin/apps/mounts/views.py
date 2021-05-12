@@ -16,7 +16,7 @@ def get_fields(mount=None):
             'id': 'mount_type',
             'value': 'hostPath' if not mount else mount['type'],
             'type': 'select',
-            'options': ['hostPath', 'nfs'],
+            'options': [ {'value': 'hostPath', 'label': 'Host Path'}, {'value': 'nfs', 'label': 'NFS' }],
             'placeholder': 'The type of file system mount'
         },
         {

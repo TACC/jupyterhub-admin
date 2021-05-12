@@ -17,34 +17,45 @@
     <h4>{{ message }}</h4>
     <div id="formBlock">
       {% for field in fields %}
-        <div class="form-group" for="{{ field.id }}"></div>
-          <label>{{ field.label }}</label>
-          {% if field.type == 'text' %}
+        {% if field.type == 'text' %}
+          <div class="form-group" for="{{ field.id }}">
+            <label>{{ field.label }}</label>
             <input 
               id="{{ field.id }}"
               class="form-control"
               type="text"
               value="{{ field.value }}"
               placeholder="{{ field.placeholder }}"/>
-          {% endif %}
-          {% if field.type == 'checkbox' %}
+          </div>
+        {% endif %}
+        {% if field.type == 'checkbox' %}
+          <div class="form-check" for="{{ field.id }}">
             <input 
-              id="{{ field.id }"
-              class="form-control"
+              id="{{ field.id }}"
+              class="form-check-input"
               type="checkbox"
               value="{{ field.value }}"
             />
-          {% endif %}
-          {% if field.type == 'select' %}
-            <select class="form-select" id="{{ field.id }}" value="{{ field.value }}">
+            <label class="form-check-label" for="{{ field.id }}">{{ field.label }}</label>
+          </div>
+        {% endif %}
+        {% if field.type == 'select' %}
+          <div class="form-group" for="{{ field.id }}">
+            <label>{{ field.label }}</label>
+            <select class="form-select" id="{{ field.id }}">
               {% for option in field.options %}
-                <option value="{{ option }}">
-                  {{ option }}
+                <option
+                  value="{{ option.value }}" 
+                  {% if option.value == field.value %}
+                    selected="selected"
+                  {% endif %}
+                >
+                  {{ option.label }}
                 </option>
               {% endfor %}
             </select>
-          {% endif %}
-        </div>
+          </div>
+        {% endif %}
       {% endfor %}
     </div>
     <button type="submit" class="btn btn-primary" id="saveButton">Save</button>
@@ -92,7 +103,7 @@
   <script>
     function getFormData() {
       const formData = { }
-      $("#formBlock input").each(
+      $("#formBlock input,#formBlock select").each(
         (index, input) => {
           const $input = $(input);
           const id = $input.attr('id');
@@ -166,8 +177,8 @@
 
     $(document).ready(function() {
       // Bind validation function for input changes
-      $("#formBlock input").change(runValidation);
-      $("#formBlock input").keyup(runValidation);
+      $("#formBlock input,#formBlock select").change(runValidation);
+      $("#formBlock input,#formBlock select").keyup(runValidation);
 
       // Hide loading spinner and errors
       $("#loadingSpinner").hide();
@@ -179,6 +190,9 @@
       // Bind callbacks to buttons
       $("#saveButton").click(saveImage);
       $("#confirmDelete").click(deleteItem);
+
+      // Run validation once
+      runValidation();
     });
   </script>
 {% endblock %}
