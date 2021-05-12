@@ -54,8 +54,24 @@ def test_images(client, template_render, get_config_metadata, metadata):
     context = {
         'error': False,
         'index': 1,
-        'image': metadata['value']['images'][1],
-        'message': "Configuration for Image 1"
+        'header': "JupyterHub Image Configuration",
+        'fields': [
+            {
+                'label': 'Display Name',
+                'id': 'display_name',
+                'value': 'Image 1',
+                'placeholder': 'Name of the image to display in the spawner'
+            },
+            {
+                'label': 'Image Name',
+                'id': 'image_name',
+                'value': 'org/repo1:tag',
+                'placeholder': 'Image repository, name and tag'
+            }
+        ],
+        'message': 'Configuration for Image 1',
+        'api': '/images/api/1',
+        'delete_confirmation': 'Image 1 (org/repo1:tag)'
     }
     response = client.get('/images/1')
     template_render.assert_called_with(context, ANY)
