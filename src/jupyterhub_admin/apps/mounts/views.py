@@ -22,7 +22,7 @@ def get_fields(mount=None):
         {
             'label': 'Remote Server',
             'id': 'server',
-            'value': '' if not mount or not mount['server'] else mount['server'],
+            'value': '' if not mount or 'server' not in mount else mount['server'],
             'type': 'text',
             'placeholder': 'The hostname of the remote server for this mount'
         },
@@ -54,11 +54,20 @@ def index(request):
     template = loader.get_template("mounts/index.html")
     context = {
         'error': False,
-        'images': []
+        'mounts': []
     }
     try:
         metadata = get_config_metadata()
-        context['mounts'] = metadata['value']['volume_mounts']
+        mounts = metadata['value']['volume_mounts']
+        for mount in mounts:
+            if mount['type'] != 'hostPath':
+                hostpath = f"{mount['type']}://{mount['server']}{mount['path']}"
+            else:
+                hostpath = mount['path']
+            context['mounts'].append({
+                'path': hostpath,
+                'mountPath': mount['mountPath']
+            })
     except Exception as e:
         context['error'] = True
         context['message'] = 'Mount configuration could not be retrieved'
@@ -76,15 +85,8 @@ def mounts(request, index):
         'api': reverse('mounts:api', args=[str(index)])
     }
     try:
-        #metadata = get_config_metadata()
-        #mount = metadata['value']['volume_mounts'][index]
-        mount = {
-            "type": "nfs",
-            "server": "c3-dtn03.corral.tacc.utexas.edu",
-            "path": "/gpfs/corral3/repl/projects/NHERI/published/PRJ-2487",
-            "mountPath": "/home/jupyter/NHERI-Published/PRJ-2487",
-            "readOnly": "True"
-        }
+        metadata = get_config_metadata()
+        mount = metadata['value']['volume_mounts'][index]
         context['fields'] = get_fields(mount)
         context['message'] = f"Configuration for {mount['mountPath']}" 
         context['delete_confirmation'] = f"{mount['mountPath']}"
@@ -121,12 +123,11 @@ def api(request, index):
             if (mount['type'] == 'nfs'):
                 mount['server'] = request.POST.get('server')
             if index == 'new':
-                metadata['value']['volume_mounts'].append(image)
+                metadata['value']['volume_mounts'].append(mount)
             else:
                 index = int(index)
                 metadata['value']['volume_mounts'][index] = mount
-            print(mount)
-            #write_config_metadata(metadata['value'])
+            write_config_metadata(metadata['value'])
             return HttpResponse("OK")
         except Exception as e:
             logger.exception(e)

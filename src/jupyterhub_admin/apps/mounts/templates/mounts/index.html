@@ -20,8 +20,8 @@
     <table border=1>
       <thead>
         <tr>
-          <th>Display Name</th>
-          <th>Image Name</th>
+          <th>Mount Path</th>
+          <th>Host Path</th>
         </tr>
       </thead>
       <tbody>
@@ -29,11 +29,11 @@
           <tr>
             <td>
               <a href="{% url 'mounts:mounts' index=forloop.counter0 %}">
-                {{ mount.display_name }}
+                {{ mount.mountPath}}
               </a>
             </td>
             <td>
-              {{ mount.name }}
+              {{ mount.path }}
             </td>
           </tr>
         {% endfor %}
