@@ -21,5 +21,6 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('jhub/', include('jupyterhub_admin.apps.jupyterhub.urls')),
     path('images/', include('jupyterhub_admin.apps.images.urls')),
+    path('mounts/', include('jupyterhub_admin.apps.mounts.urls')),
     path('', include('jupyterhub_admin.apps.main.urls'))
 ]

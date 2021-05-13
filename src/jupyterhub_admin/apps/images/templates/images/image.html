@@ -1,168 +1,17 @@
-{% extends "base.html" %}
-{% load static %}
-{% block title %} Workbench {% endblock %}
-{% block head_extra %}
-  <base href="{% url 'main:index' %}">
-{% endblock %}
-{% block styles %}
-  <link rel="stylesheet" href="">
-  <link rel="stylesheet" href="">
-{% endblock %}
-{% block content %}
-  <h3>
-    JupyterHub Image Configuration
-  </h3>
-  {% if error == True %}
-    <h4>
-      {{ message }}
-    </h4>
-  {% else %}
-    <h4>{{ message }}</h4>
-    <div class="form-group" for="display_name">
-      <label>Display Name</label>
-      <input 
-        id="display_name"
-        class="form-control"
-        type="text"
-        value="{{ image.display_name }}"
-        placeholder="Display name for the image"/>
-    </div>
-    <div class="form-group" for="image_name">
-      <label>Image Name</label>
-      <input
-        id="image_name"
-        class="form-control"
-        type="text"
-        value="{{ image.name }}"
-        placeholder="DockerHub image name" />
-    </div>
-    <button type="submit" class="btn btn-primary" id="submitImageButton">Save</button>
-    {% if index != 'new' %}
-      <button 
-        type="submit" 
-        class="btn btn-danger" 
-        id="deleteImageButton" 
-        data-toggle="modal" 
-        data-target="#deleteImageModal"
-      >
-        Delete
-      </button>
-    {% endif %}
-    <div class="spinner-border" role="status" id="submitImageSpinner">
-      <span class="sr-only">Loading...</span>
-    </div>
-    <div id="submitImageError">
-      Error trying to save image configuration
-    </div>
-    <div class="modal" role="dialog" id="deleteImageModal">
-      <div class="modal-dialog" role="document">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title">Confirm Image Delete</h5>
-            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-              <span aria-hidden="true">&times;</span>
-            </button>
-          </div>
-          <div class="modal-body">
-            <p>Are you sure you wish to delete {{ image.display_name }} ({{ image.name }})?</p>
-          </div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-danger" id="confirmDeleteImage" data-dismiss="modal">Delete</button>
-            <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-          </div>
-        </div>
-      </div>
-    </div>
-  {% endif %}
-{% endblock %}
-{% block scripts %}
+{% extends "crud.html" %}
+{% block callbacks %}
 <script>
-  function imageSubmitSuccess(data, textStatus, jqXHR) {
+  function validate(formData) {
+    // Validate inputs
+    const display_name = formData.display_name; 
+    const image_name = formData.image_name;
+    const re = RegExp("^(?:(?=[^:\/]{1,253})(?!-)[a-zA-Z0-9-]{1,63}(?<!-)(?:\.(?!-)[a-zA-Z0-9-]{1,63}(?<!-))*(?::[0-9]{1,5})?/)?((?![._-])(?:[a-z0-9._-]*)(?<![._-])(?:/(?![._-])[a-z0-9._-]*(?<![._-]))*)(?::(?![.-])[a-zA-Z0-9_.-]{1,128})?");
+    return (display_name && display_name.length > 0 && image_name && re.test(image_name));
+  }
+
+  function saveRedirect(data, textStatus, jqXHR) {
     // Upon successfully saving an image, redirect back to images list
     window.location.assign("{% url 'images:index' %}");
   }
-
-  function imageSubmitFailure(jqXHR, textStatus, errorThrown) {
-    // Upon failing to save or delete an image, show the error
-    $("#submitImageError").show();
-  }
-
-  function validate() {
-    // Validate inputs
-    const display_name = $("#display_name").val();
-    const image_name = $("#image_name").val();
-    const re = RegExp("^(?:(?=[^:\/]{1,253})(?!-)[a-zA-Z0-9-]{1,63}(?<!-)(?:\.(?!-)[a-zA-Z0-9-]{1,63}(?<!-))*(?::[0-9]{1,5})?/)?((?![._-])(?:[a-z0-9._-]*)(?<![._-])(?:/(?![._-])[a-z0-9._-]*(?<![._-]))*)(?::(?![.-])[a-zA-Z0-9_.-]{1,128})?");
-    if (display_name && display_name.length > 0 && image_name && re.test(image_name)) {
-      $("#submitImageButton").prop("disabled", false);
-    } else {
-      $("#submitImageButton").prop("disabled", true);
-    }
-  }
-
-  function saveImage() {
-    $.ajax(
-      "{% url 'images:api' index=index %}",
-      {
-        method: 'POST',
-        headers: {'X-CSRFToken': '{{ csrf_token }}'},
-        data: {
-          image_name: $("#image_name").val(),
-          display_name: $("#display_name").val(),
-          index: "{{ index }}"
-        },
-        success: imageSubmitSuccess,
-        error: imageSubmitFailure
-      }
-    )
-  }
-
-  function deleteImage() {
-    $.ajax(
-      "{% url 'images:api' index=index %}",
-      {
-        method: 'DELETE',
-        headers: {'X-CSRFToken': '{{ csrf_token }}'},
-        data: {
-          index: "{{ index }}"
-        },
-        success: imageSubmitSuccess,
-        error: imageSubmitFailure
-      }
-    )
-  }
-
-  $(document).ajaxSend(function() {
-    // Before sending any ajax calls, show the loading spinner and disable buttons
-    $("#submitImageSpinner").show();
-    $("#submitImageError").hide();
-    $("#deleteImageButton").prop("disabled", true);
-    $("#submitImageButton").prop("disabled", true);
-  });
-
-  $(document).ajaxStop(function() {
-    // After sending ajax calls, hide the loading spinner and enable buttons
-    $("#submitImageSpinner").hide();
-    $("#deleteImageButton").prop("disabled", false);
-    $("#submitImageButton").prop("disabled", false);
-  })
-
-  $(document).ready(function() {
-    // Bind validation function for input changes
-    $("#display_name").change(validate);
-    $("#display_name").keyup(validate);
-    $("#image_name").change(validate);
-    $("#image_name").keyup(validate);
-
-    // Hide loading spinner and errors
-    $("#submitImageSpinner").hide();
-    $("#submitImageError").hide();
-
-    // Set initial state of submit button to disabled
-    $("#submitImageButton").prop("disabled", true);
-
-    // Bind callbacks to buttons
-    $("#submitImageButton").click(saveImage);
-    $("#confirmDeleteImage").click(deleteImage);
-  });
 </script>
 {% endblock %}

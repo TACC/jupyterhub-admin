@@ -1,0 +1,25 @@
+{% extends "crud.html" %}
+{% block callbacks %}
+<script>
+  function validate(formData) {
+    // Validate inputs
+    const mount_type = formData.mount_type;
+    const server = formData.server;
+    const path = formData.path;
+    const mount_path = formData.mount_path;
+
+    if (mount_type === 'hostPath') {
+      $("#formBlock #server").attr('disabled', true);
+    } else {
+      $("#formBlock #server").attr('disabled', false);
+    }
+
+    return mount_type && path && mount_path && (mount_type === 'hostPath' || server);
+  }
+
+  function saveRedirect(data, textStatus, jqXHR) {
+    // Upon successfully saving an image, redirect back to images list
+    window.location.assign("{% url 'mounts:index' %}");
+  }
+</script>
+{% endblock %}

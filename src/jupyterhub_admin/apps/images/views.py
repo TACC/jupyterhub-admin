@@ -1,10 +1,31 @@
 from django.http import HttpResponse
 from django.template import loader
+from django.urls import reverse
 from jupyterhub_admin.metadata import get_config_metadata, write_config_metadata
 import logging
+import copy
 
 
 logger = logging.getLogger(__name__)
+
+
+def get_fields(image=None):
+    return [
+        {
+            'label': 'Display Name',
+            'id': 'display_name',
+            'value': '' if not image else image['display_name'],
+            'type': 'text',
+            'placeholder': "Name of the image to display in the spawner"
+        },
+        {
+            'label': 'Image Name',
+            'id': 'image_name',
+            'value': '' if not image else image['name'],
+            'type': 'text',
+            'placeholder': "Image repository, name and tag"
+        }
+    ]
 
 
 def index(request):
@@ -27,12 +48,17 @@ def images(request, index):
     template = loader.get_template("images/image.html")
     context = {
         'error': False,
-        'index': index
+        'index': index,
+        'header': "JupyterHub Image Configuration",
+        'fields': [],
+        'api': reverse('images:api', args=[str(index)])
     }
     try:
         metadata = get_config_metadata()
-        context['image'] = metadata['value']['images'][index]
-        context['message'] = f"Configuration for {context['image']['display_name']}" 
+        image = metadata['value']['images'][index]
+        context['fields'] = get_fields(image)
+        context['message'] = f"Configuration for {image['display_name']}" 
+        context['delete_confirmation'] = f"{image['display_name']} ({image['name']})"
     except Exception as e:
         context['error'] = True
         context['message'] = 'Could not retrieve JupyterHub Image'
@@ -45,11 +71,10 @@ def new_image(request):
     context = {
         'error': False,
         'index': 'new',
-        'image': {
-            'display_name': '',
-            'image_name': ''
-        },
-        'message': f"Add a new JupyterHub Image"
+        'fields': get_fields(),
+        'api': reverse('images:api', args=["new"]),
+        'header': f"JupyterHub Image Configuration",
+        'message': f"Add a new JupyterHub Image",
     }
     return HttpResponse(template.render(context, request))
 
