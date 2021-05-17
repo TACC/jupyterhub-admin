@@ -2,9 +2,7 @@
 <!DOCTYPE html>
 <html>
   <head>
-    {% include 'includes/analytics.html' %}
     <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <title>{% block title %}{% endblock %}</title>
     <meta name="viewport" content="width=device-width">
     <meta name="description" content="{{ site.description }}">
@@ -23,9 +21,10 @@
   <body>
     <div class="content">
       {% include 'includes/header.html' %}
-      {% include 'includes/messages.html' %}
       {% block breadcrumb %}{% endblock %}
-      {% block content %}{% endblock %}
+      <div class="container-fluid" style="padding-top: 1em;">
+        {% block content %}{% endblock %}
+      </div>      
     </div>
     {% include 'includes/footer.html' %}
     <!-- Bootstrap JS -->
