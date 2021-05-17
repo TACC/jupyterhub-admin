@@ -38,12 +38,12 @@ if not JUPYTERHUB_TOKEN:
     logger.warning("Missing JUPYTERHUB_TOKEN environment variable")
 
 # API URL for JupyterHub
-JUPYTERHUB_API = 'JUPYTERHUB_API'
-if not JUPYTERHUB_API:
+JUPYTERHUB_SERVER = 'JUPYTERHUB_SERVER'
+if not JUPYTERHUB_SERVER:
     logger.warning("Missing JUPYTERHUB_API environment variable")
 
 JUPYTERHUB_NAME = 'JUPYTERHUB_NAME'
-if not JUPYTERHUB_API:
+if not JUPYTERHUB_NAME:
     logger.warning("Missing JUPYTERHUB_NAME environment variable")
 
 # Agave API for Metadata

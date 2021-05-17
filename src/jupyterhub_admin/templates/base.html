@@ -22,7 +22,9 @@
     <div class="content">
       {% include 'includes/header.html' %}
       {% block breadcrumb %}{% endblock %}
-      {% block content %}{% endblock %}
+      <div class="container-fluid" style="padding-top: 1em;">
+        {% block content %}{% endblock %}
+      </div>      
     </div>
     {% include 'includes/footer.html' %}
     <!-- Bootstrap JS -->

@@ -3,7 +3,7 @@ import requests
 import logging
 
 def jupyterhub_request(method, endpoint, data=None, params=None):
-    api_url = settings.JUPYTERHUB_API + endpoint
+    api_url = settings.JUPYTERHUB_SERVER + '/hub/api' + endpoint
     headers = {
         'Authorization': 'token %s' % settings.JUPYTERHUB_TOKEN
     }
