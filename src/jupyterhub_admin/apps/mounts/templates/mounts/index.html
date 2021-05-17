@@ -10,14 +10,17 @@
 {% endblock %}
 {% block content %}
   <h3>
-    JupyterHub Images
+    JupyterHub Mounts
   </h3>
+  <p>
+    Here you can configure the volume mounts for the JupyterHub
+  </p>
   {% if error == True %}
     <h4>
       {{ message }}
     </h4>
   {% else %}
-    <table border=1>
+    <table border=1 class="table">
       <thead>
         <tr>
           <th>Mount Path</th>
@@ -39,7 +42,6 @@
         {% endfor %}
       </tbody>
     </table>
-    <br />
     <a class="btn btn-primary" href="{% url 'mounts:new' %}">+ New Image</a>
   {% endif %}
 {% endblock %}

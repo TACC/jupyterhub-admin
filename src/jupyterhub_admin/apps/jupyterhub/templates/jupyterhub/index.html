@@ -12,12 +12,16 @@
   <h3>
     JupyterHub Servers
   </h3>
+  <p>
+    This is a list of users on the JupyterHub. If they currently have a running server,
+    you can view it and shut it down. Otherwise, the user is listed as <i>inactive</i>.
+  </p>
   {% if error == True %}
     <h4>
       Error retrieving JupyterHub servers
     </h4>
   {% else %}
-    <table border=1>
+    <table border=1 class="table">
       <thead>
         <tr>
           <th>
