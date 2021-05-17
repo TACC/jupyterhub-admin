@@ -65,7 +65,7 @@ def user(request, username):
     template = loader.get_template("jupyterhub/user.html")
     context = {
         'error': False,
-        'message': f'JupyterHub user {username}',
+        'message': f'JupyterHub User {username}',
     }
     try:
         context['user'] = format_user(parse_user(get_user(username)))

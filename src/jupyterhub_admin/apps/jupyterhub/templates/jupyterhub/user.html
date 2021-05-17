@@ -10,14 +10,13 @@
 {% endblock %}
 {% block content %}
   <h3>
-    JupyterHub Servers
+    {{ message }}
   </h3>
   {% if error == True %}
-    <h4>
-      {{ message }}
-    </h4>
+    <div class="alert alert-primary" role="alert">
+      {{ message }} 
+    </div>
   {% else %}
-    <h4>{{ message }}</h4>
     {% if user.server %}
       <dl>
         <dt>Started</dt>
@@ -33,7 +32,7 @@
         Error while trying to stop server
       </div>
     {% else %}
-      <i>Inactive</i>
+      <i>This user is currently inactive, and does not have a running server.</i>
     {% endif %}
   {% endif %}
 {% endblock %}

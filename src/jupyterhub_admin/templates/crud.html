@@ -10,11 +10,11 @@
     {{ header }}
   </h3>
   {% if error == True %}
-    <h4>
+    <div class="alert alert-primary" role="alert">
       {{ message }}
-    </h4>
+    </div>
   {% else %}
-    <h4>{{ message }}</h4>
+    <p>{{ message }}</p>
     <div id="formBlock">
       {% for field in fields %}
         {% if field.type == 'text' %}
