@@ -4,11 +4,11 @@ import json
 
 
 def get_config_metadata_name():
-    return f"config.{settings.JUPYTERHUB_NAME}.jhub"
+    return f"config.{settings.TENANT}.{settings.INSTANCE}.jhub"
 
 
 def get_config_metadata():
-    ag = Agave(api_server=settings.AGAVE_API, token=settings.AGAVE_TOKEN)
+    ag = Agave(api_server=settings.AGAVE_API, token=settings.AGAVE_SERVICE_TOKEN)
     metadata = ag.meta.listMetadata()
     matching = list(filter(
         lambda meta: meta['name'] == get_config_metadata_name(),
@@ -18,7 +18,7 @@ def get_config_metadata():
 
 
 def write_config_metadata(value):
-    ag = Agave(api_server=settings.AGAVE_API, token=settings.AGAVE_TOKEN)
+    ag = Agave(api_server=settings.AGAVE_API, token=settings.AGAVE_SERVICE_TOKEN)
     meta = get_config_metadata()
     meta['value'] = value
     ag.meta.updateMetadata(body=meta, uuid=meta['uuid'])
