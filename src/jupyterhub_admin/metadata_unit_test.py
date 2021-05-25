@@ -13,13 +13,13 @@ def mock_agave(mocker):
 
 
 def test_get_config_metadata_name():
-    assert get_config_metadata_name() == "config.JUPYTERHUB_NAME.jhub"
+    assert get_config_metadata_name() == "config.JUPYTERHUB.PROD.jhub"
 
 
 def test_get_config_metadata(mock_agave):
     mock_agave.return_value.meta.listMetadata.return_value = [
         {
-            'name': 'config.JUPYTERHUB_NAME.jhub',
+            'name': 'config.JUPYTERHUB.PROD.jhub',
             'value': 'MOCK_VALUE'
         }
     ]

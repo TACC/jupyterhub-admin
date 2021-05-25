@@ -6,7 +6,7 @@ from django.conf import settings
 def index(request):
     template = loader.get_template("main/index.html")
     context = {
-        'name': settings.JUPYTERHUB_NAME,
+        'name': f"{settings.TENANT}.{settings.INSTANCE}",
         'server': settings.JUPYTERHUB_SERVER
     }
     return HttpResponse(template.render(context, request))

@@ -42,9 +42,13 @@ JUPYTERHUB_SERVER = 'JUPYTERHUB_SERVER'
 if not JUPYTERHUB_SERVER:
     logger.warning("Missing JUPYTERHUB_API environment variable")
 
-JUPYTERHUB_NAME = 'JUPYTERHUB_NAME'
-if not JUPYTERHUB_NAME:
-    logger.warning("Missing JUPYTERHUB_NAME environment variable")
+TENANT = 'JUPYTERHUB'
+if not TENANT:
+    logger.warning("Missing TENANT environment variable")
+
+INSTANCE = 'PROD'
+if not INSTANCE:
+    logger.warning("Missing INSTANCE environment variable") 
 
 # Agave API for Metadata
 AGAVE_API = 'AGAVE_API'
@@ -52,9 +56,9 @@ if not AGAVE_API:
     logger.warning("Missing AGAVE_API environment variable")
 
 # Agave token for Jupyterh account
-AGAVE_TOKEN = 'AGAVE_TOKEN'
-if not AGAVE_TOKEN:
-    logger.warning("Missing AGAVE_TOKEN environment variable")
+AGAVE_SERVICE_TOKEN = 'AGAVE_SERVICE_TOKEN'
+if not AGAVE_SERVICE_TOKEN:
+    logger.warning("Missing AGAVE_SERVICE_TOKEN environment variable")
 
 ALLOWED_HOSTS = ['*']
 

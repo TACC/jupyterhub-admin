@@ -13,6 +13,7 @@ https://docs.djangoproject.com/en/3.2/ref/settings/
 from pathlib import Path
 import os
 import logging
+from django.core.management.utils import get_random_secret_key
 
 
 logger = logging.getLogger(__name__)
@@ -26,7 +27,8 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', None) 
 if not SECRET_KEY:
-    logger.warning("Missing DJANGO_SECRET_KEY environment variable")
+    logger.warning("Missing DJANGO_SECRET_KEY environment variable. Generating random secret key.")
+SECRET_KEY = get_random_secret_key()
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.environ.get('DEBUG', False)
@@ -41,9 +43,13 @@ JUPYTERHUB_SERVER = os.environ.get('JUPYTERHUB_SERVER', None)
 if not JUPYTERHUB_SERVER:
     logger.warning("Missing JUPYTERHUB_API environment variable")
 
-JUPYTERHUB_NAME = os.environ.get('JUPYTERHUB_NAME', None)
-if not JUPYTERHUB_NAME:
-    logger.warning("Missing JUPYTERHUB_NAME environment variable")
+TENANT = os.environ.get('TENANT', None)
+if not TENANT:
+    logger.warning("Missing TENANT environment variable")
+
+INSTANCE = os.environ.get('INSTANCE', None)
+if not TENANT:
+    logger.warning("Missing INSTANCE environment variable")
 
 # Agave API for Metadata
 AGAVE_API = os.environ.get('AGAVE_API', None)
@@ -51,9 +57,9 @@ if not AGAVE_API:
     logger.warning("Missing AGAVE_API environment variable")
 
 # Agave token for Jupyterh account
-AGAVE_TOKEN = os.environ.get('AGAVE_TOKEN', None)
-if not AGAVE_TOKEN:
-    logger.warning("Missing AGAVE_TOKEN environment variable")
+AGAVE_SERVICE_TOKEN = os.environ.get('AGAVE_SERVICE_TOKEN', None)
+if not AGAVE_SERVICE_TOKEN:
+    logger.warning("Missing AGAVE_SERVICE_TOKEN environment variable")
 
 ALLOWED_HOSTS = ['*']
 
@@ -179,6 +185,6 @@ LOGGING = {
     },
     'root': {
         'handlers': ['console'],
-        'level': 'WARNING',
+        'level': 'DEBUG' if DEBUG else 'INFO',
     },
 }
