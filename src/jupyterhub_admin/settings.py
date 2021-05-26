@@ -61,6 +61,12 @@ AGAVE_SERVICE_TOKEN = os.environ.get('AGAVE_SERVICE_TOKEN', None)
 if not AGAVE_SERVICE_TOKEN:
     logger.warning("Missing AGAVE_SERVICE_TOKEN environment variable")
 
+# Agave login client key and secret
+AGAVE_CLIENT_KEY = os.environ.get('AGAVE_CLIENT_KEY', None)
+AGAVE_CLIENT_SECRET = os.environ.get('AGAVE_CLIENT_SECRET', None)
+if not AGAVE_CLIENT_KEY or not AGAVE_CLIENT_SECRET:
+    logger.warning("Missing AGAVE_CLIENT_KEY or AGAVE_CLIENT_SECRET environment variable")
+
 ALLOWED_HOSTS = ['*']
 
 
@@ -87,7 +93,8 @@ INSTALLED_APPS = [
     'jupyterhub_admin.apps.jupyterhub',
     'jupyterhub_admin.apps.main',
     'jupyterhub_admin.apps.images',
-    'jupyterhub_admin.apps.mounts'
+    'jupyterhub_admin.apps.mounts',
+    'jupyterhub_admin.apps.agaveauth',
 ]
 
 MIDDLEWARE = [

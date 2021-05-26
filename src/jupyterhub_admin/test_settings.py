@@ -60,6 +60,13 @@ AGAVE_SERVICE_TOKEN = 'AGAVE_SERVICE_TOKEN'
 if not AGAVE_SERVICE_TOKEN:
     logger.warning("Missing AGAVE_SERVICE_TOKEN environment variable")
 
+# Agave login client key and secret
+AGAVE_CLIENT_KEY = 'AGAVE_CLIENT_KEY'
+AGAVE_CLIENT_SECRET = 'AGAVE_CLIENT_SECRET'
+if not AGAVE_CLIENT_KEY or not AGAVE_CLIENT_SECRET:
+    logger.warning("Missing AGAVE_CLIENT_KEY or AGAVE_CLIENT_SECRET environment variable")
+
+
 ALLOWED_HOSTS = ['*']
 
 
