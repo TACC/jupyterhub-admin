@@ -16,7 +16,7 @@ class AgaveOAuthBackend(ModelBackend):
 
         if 'backend' in kwargs and kwargs['backend'] == 'agave':
             token = kwargs['token']
-            base_url = getattr(settings, 'AGAVE_TENANT_BASEURL')
+            base_url = getattr(settings, 'AGAVE_API')
 
             logger.info('Attempting login via Agave with token "%s"' %
                              token[:8].ljust(len(token), '-'))

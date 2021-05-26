@@ -19,7 +19,7 @@ METRICS = logging.getLogger('metrics.{}'.format(__name__))
 
 
 def logged_out(request):
-    return render(request, 'portal/apps/auth/logged_out.html')
+    return render(request, 'auth/logged_out.html')
 
 
 def _get_auth_state():
@@ -38,9 +38,15 @@ def agave_oauth(request):
     next_page = request.GET.get('next')
     if next_page:
         session['next'] = next_page
-
-    redirect_uri = 'https://{}{}'.format(request.get_host(),
-                                         reverse('auth:agave_oauth_callback'))
+    
+    if request.get_host() == "localhost:8000":
+        redirect_uri = 'http://{}{}'
+    else:
+        redirect_uri = 'https://{}{}'
+    redirect_uri = redirect_uri.format(
+        request.get_host(),
+        reverse('auth:agave_oauth_callback')
+    )
     logger.debug('redirect_uri %s', redirect_uri)
     METRICS.debug("user:{} starting oauth redirect login".format(request.user.username))
     authorization_url = (
@@ -67,13 +73,15 @@ def agave_oauth_callback(request):
         return HttpResponseBadRequest('Authorization State Failed')
 
     if 'code' in request.GET:
-        # obtain a token for the user
-        # Using http for dev.
-        # redirect_uri = 'http://{}{}'.format(request.get_host(),
-        #                                    reverse('portal_auth:agave_oauth_callback'))
-        # Use https for prod.
-        redirect_uri = 'https://{}{}'.format(request.get_host(),
-                                             reverse('portal_auth:agave_oauth_callback'))
+        if request.get_host() == "localhost:8000":
+            redirect_uri = 'http://{}{}'
+        else:
+            redirect_uri = 'https://{}{}'
+        redirect_uri = redirect_uri.format(
+            request.get_host(),
+            reverse('auth:agave_oauth_callback')
+        )
+        logger.debug('redirect_uri %s', redirect_uri)
         code = request.GET['code']
         tenant_base_url = getattr(settings, 'AGAVE_API')
         client_key = getattr(settings, 'AGAVE_CLIENT_KEY')
@@ -102,13 +110,13 @@ def agave_oauth_callback(request):
                 'Authentication failed. Please try again. If this problem '
                 'persists please submit a support ticket.'
             )
-            return HttpResponseRedirect(reverse('portal_accounts:logout'))
+            return HttpResponseRedirect(reverse('auth:logout'))
     else:
         if 'error' in request.GET:
             error = request.GET['error']
             logger.warning('Authorization failed: %s', error)
 
-        return HttpResponseRedirect(reverse('portal_accounts:logout'))
+        return HttpResponseRedirect(reverse('auth:logout'))
 
     if 'next' in request.session:
         next_uri = request.session.pop('next')

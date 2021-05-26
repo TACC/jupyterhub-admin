@@ -70,6 +70,8 @@ if not AGAVE_CLIENT_KEY or not AGAVE_CLIENT_SECRET:
 ALLOWED_HOSTS = ['*']
 
 
+LOGIN_URL = '/auth/agave'
+
 STATIC_URL = '/static/'
 MEDIA_URL = '/media/'
 
@@ -156,6 +158,10 @@ AUTH_PASSWORD_VALIDATORS = [
         'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
     },
 ]
+
+
+AUTHENTICATION_BACKENDS = ['jupyterhub_admin.apps.agaveauth.backends.AgaveOAuthBackend',
+                           'django.contrib.auth.backends.ModelBackend']
 
 
 # Internationalization
