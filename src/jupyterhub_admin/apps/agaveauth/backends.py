@@ -20,7 +20,6 @@ class AgaveOAuthBackend(ModelBackend):
 
             logger.info('Attempting login via Agave with token "%s"' %
                              token[:8].ljust(len(token), '-'))
-
             response = requests.get('%s/profiles/v2/me' % base_url,
                                     headers={'Authorization': 'Bearer %s' % token})
             json_result = response.json()
@@ -28,7 +27,7 @@ class AgaveOAuthBackend(ModelBackend):
                 agave_user = json_result['result']
                 username = agave_user['username']
                 UserModel = get_user_model()
-                user = UserModel.objects.get_or_create(username=username)
+                user, _ = UserModel.objects.get_or_create(username=username)
                 user.save()
                 logger.info('Login successful for user "%s"' % username)
             else:

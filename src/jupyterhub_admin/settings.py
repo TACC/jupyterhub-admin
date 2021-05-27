@@ -69,8 +69,8 @@ if not AGAVE_CLIENT_KEY or not AGAVE_CLIENT_SECRET:
 
 ALLOWED_HOSTS = ['*']
 
-
 LOGIN_URL = '/auth/agave'
+LOGIN_REDIRECT_URL = '/'
 
 STATIC_URL = '/static/'
 MEDIA_URL = '/media/'

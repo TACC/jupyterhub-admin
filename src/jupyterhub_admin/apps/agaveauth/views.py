@@ -26,6 +26,17 @@ def _get_auth_state():
     return secrets.token_hex(24)
 
 
+def _get_redirect_uri(request):
+    redirect_uri = 'https://{}{}'
+    if request.get_host() == "localhost:8000":
+        redirect_uri = 'http://{}{}'
+    redirect_uri = redirect_uri.format(
+        request.get_host(),
+        reverse('auth:agave_oauth_callback')
+    )
+    return redirect_uri
+
+
 # Create your views here.
 def agave_oauth(request):
     """First step for agave OAuth workflow.
@@ -38,16 +49,7 @@ def agave_oauth(request):
     next_page = request.GET.get('next')
     if next_page:
         session['next'] = next_page
-    
-    if request.get_host() == "localhost:8000":
-        redirect_uri = 'http://{}{}'
-    else:
-        redirect_uri = 'https://{}{}'
-    redirect_uri = redirect_uri.format(
-        request.get_host(),
-        reverse('auth:agave_oauth_callback')
-    )
-    logger.debug('redirect_uri %s', redirect_uri)
+    redirect_uri = _get_redirect_uri(request)
     METRICS.debug("user:{} starting oauth redirect login".format(request.user.username))
     authorization_url = (
         '%s/authorize?client_id=%s&response_type=code&redirect_uri=%s&state=%s' % (
@@ -73,30 +75,24 @@ def agave_oauth_callback(request):
         return HttpResponseBadRequest('Authorization State Failed')
 
     if 'code' in request.GET:
-        if request.get_host() == "localhost:8000":
-            redirect_uri = 'http://{}{}'
-        else:
-            redirect_uri = 'https://{}{}'
-        redirect_uri = redirect_uri.format(
-            request.get_host(),
-            reverse('auth:agave_oauth_callback')
-        )
+        redirect_uri = _get_redirect_uri(request)
         logger.debug('redirect_uri %s', redirect_uri)
         code = request.GET['code']
         tenant_base_url = getattr(settings, 'AGAVE_API')
         client_key = getattr(settings, 'AGAVE_CLIENT_KEY')
         client_sec = getattr(settings, 'AGAVE_CLIENT_SECRET')
-        redirect_uri = redirect_uri
         body = {
             'grant_type': 'authorization_code',
             'code': code,
             'redirect_uri': redirect_uri,
         }
         # TODO update to token call in agavepy
+        logger.debug("Redeem authorization code for token")
         response = requests.post('%s/token' % tenant_base_url,
                                  data=body,
                                  auth=(client_key, client_sec))
         token_data = response.json()
+        logger.debug(token_data)
         token_data['created'] = int(time.time())
         # log user in
         user = authenticate(backend='agave', token=token_data['access_token'])

@@ -66,12 +66,12 @@ AGAVE_CLIENT_SECRET = 'AGAVE_CLIENT_SECRET'
 if not AGAVE_CLIENT_KEY or not AGAVE_CLIENT_SECRET:
     logger.warning("Missing AGAVE_CLIENT_KEY or AGAVE_CLIENT_SECRET environment variable")
 
-
 ALLOWED_HOSTS = ['*']
 
+LOGIN_URL = '/auth/agave'
+LOGIN_REDIRECT_URL = '/'
 
 # Application definition
-
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
