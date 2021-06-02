@@ -47,7 +47,7 @@ def template_render(mocker):
     yield mock_render
 
 
-def test_index(client, template_render, get_config_metadata, metadata):
+def test_index(authenticated_client, template_render, get_config_metadata, metadata):
     context = {
         'error': False,
         'mounts': [
@@ -61,11 +61,11 @@ def test_index(client, template_render, get_config_metadata, metadata):
             }
         ]
     }
-    response = client.get('/mounts/')
+    response = authenticated_client.get('/mounts/')
     template_render.assert_called_with(context, ANY)
 
 
-def test_mounts(client, template_render, get_config_metadata, metadata):
+def test_mounts(authenticated_client, template_render, get_config_metadata, metadata):
     context = {
         'error': False,
         'index': 1,
@@ -112,11 +112,11 @@ def test_mounts(client, template_render, get_config_metadata, metadata):
         'api': '/mounts/api/1',
         'delete_confirmation': '/jupyter/path1'
     }
-    response = client.get('/mounts/1')
+    response = authenticated_client.get('/mounts/1')
     template_render.assert_called_with(context, ANY)
 
 
-def test_api_post(client, get_config_metadata, write_config_metadata, metadata):
+def test_api_post(authenticated_client, get_config_metadata, write_config_metadata, metadata):
     data = {
         'mount_type': 'hostPath',
         'server': 'IGNORED',
@@ -131,12 +131,12 @@ def test_api_post(client, get_config_metadata, write_config_metadata, metadata):
         'mountPath': '/jupyter/mount',
         'readOnly': 'True'
     }
-    response = client.post('/mounts/api/1', data=data)
+    response = authenticated_client.post('/mounts/api/1', data=data)
     assert response.status_code == 200
     write_config_metadata.assert_called_with(expected)
 
 
-def test_api_post_nfs(client, get_config_metadata, write_config_metadata, metadata):
+def test_api_post_nfs(authenticated_client, get_config_metadata, write_config_metadata, metadata):
     data = {
         'mount_type': 'nfs',
         'server': 'nfs.host',
@@ -152,12 +152,12 @@ def test_api_post_nfs(client, get_config_metadata, write_config_metadata, metada
         'mountPath': '/jupyter/mount',
         'readOnly': 'True'
     }
-    response = client.post('/mounts/api/1', data=data)
+    response = authenticated_client.post('/mounts/api/1', data=data)
     assert response.status_code == 200
     write_config_metadata.assert_called_with(expected)
 
 
-def test_api_new(client, get_config_metadata, write_config_metadata, metadata):
+def test_api_new(authenticated_client, get_config_metadata, write_config_metadata, metadata):
     data = {
         'mount_type': 'nfs',
         'server': 'nfs.host',
@@ -173,13 +173,13 @@ def test_api_new(client, get_config_metadata, write_config_metadata, metadata):
         'mountPath': '/jupyter/mount',
         'readOnly': 'True'
     })
-    response = client.post('/mounts/api/new', data=data)
+    response = authenticated_client.post('/mounts/api/new', data=data)
     assert response.status_code == 200
     write_config_metadata.assert_called_with(expected)
 
 
-def test_api_delete(client, get_config_metadata, write_config_metadata, metadata):
-    response = client.delete('/mounts/api/1')
+def test_api_delete(authenticated_client, get_config_metadata, write_config_metadata, metadata):
+    response = authenticated_client.delete('/mounts/api/1')
     assert response.status_code == 200
     write_config_metadata.assert_called_with({
         'volume_mounts': [

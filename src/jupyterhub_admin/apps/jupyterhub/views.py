@@ -7,6 +7,7 @@ from jupyterhub_admin.jhub_api import (
     parse_user,
     has_server
 )
+from django.contrib.auth.decorators import login_required
 import dateutil.parser
 import logging
 
@@ -43,6 +44,7 @@ def apply_sorting(users, sorting=None):
     return users
 
 
+@login_required
 def index(request):
     template = loader.get_template("jupyterhub/index.html")
     sorting = request.GET.get('sorting', None)
@@ -61,6 +63,7 @@ def index(request):
     return HttpResponse(template.render(context, request))
 
 
+@login_required
 def user(request, username):
     template = loader.get_template("jupyterhub/user.html")
     context = {
@@ -76,6 +79,7 @@ def user(request, username):
     return HttpResponse(template.render(context, request))
 
 
+@login_required
 def server(request, username):
     if request.method == 'DELETE':
         try:
