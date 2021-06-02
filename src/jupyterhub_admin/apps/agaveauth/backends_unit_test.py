@@ -41,10 +41,13 @@ def test_user_not_in_metadata(profile_mock, metadata_mock):
         }
     }
     metadata_mock.return_value = {
+        'value': {}
     }
     assert backend.authenticate(backend='agave', token='mock_token') is None
     metadata_mock.return_value = {
-        'admin_users': []
+        'value': {
+            'admin_users': []
+        }
     }
     assert backend.authenticate(backend='agave', token='mock_token') is None
 
@@ -58,6 +61,8 @@ def test_authenticate(profile_mock, metadata_mock):
         }
     }
     metadata_mock.return_value = {
-        'admin_users': ['username']
+        'value': {
+            'admin_users': ['username']
+        }        
     }
     assert backend.authenticate(backend='agave', token='mock_token').username == 'username'

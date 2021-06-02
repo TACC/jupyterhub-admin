@@ -29,7 +29,7 @@ class AgaveOAuthBackend(ModelBackend):
             agave_user = json_result['result']
             username = agave_user['username']
             meta = get_config_metadata()
-            if 'admin_users' not in meta or username not in meta['admin_users']:
+            if 'admin_users' not in meta['value'] or username not in meta['value']['admin_users']:
                 raise Exception('%s is not a hub admin user' % username)
             UserModel = get_user_model()
             user, _ = UserModel.objects.get_or_create(username=username)
