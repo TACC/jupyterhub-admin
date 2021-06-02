@@ -7,7 +7,7 @@ import requests
 import secrets
 from django.conf import settings
 from django.contrib import messages
-from django.contrib.auth import authenticate, login
+from django.contrib.auth import authenticate, login, logout
 from django.urls import reverse
 from django.core.exceptions import ObjectDoesNotExist
 from django.http import HttpResponseRedirect, HttpResponseBadRequest, HttpResponse
@@ -19,6 +19,7 @@ METRICS = logging.getLogger('metrics.{}'.format(__name__))
 
 
 def logged_out(request):
+    logout(request)
     return render(request, 'auth/logged_out.html')
 
 
