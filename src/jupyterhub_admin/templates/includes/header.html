@@ -44,5 +44,19 @@
         </div>
       </li>
     </ul>
+    <ul class="navbar-nav">
+      {% if request.user.is_authenticated %}
+        <li class="nav-item">
+          <span class="navbar-text">
+            {{ request.user.username}} 
+            (<a href="{% url 'auth:logout' %}">Log Out</a>)
+          </span>
+        </li>
+      {% else %}
+        <li class="nav-item">
+          <a class="nav-link" href="{% url 'auth:agave_oauth' %}">Log In</a>
+        </li>
+      {% endif %}
+    </ul>
   </div>
 </nav>

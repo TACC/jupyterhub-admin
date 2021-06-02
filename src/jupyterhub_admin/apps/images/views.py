@@ -2,6 +2,7 @@ from django.http import HttpResponse
 from django.template import loader
 from django.urls import reverse
 from jupyterhub_admin.metadata import get_config_metadata, write_config_metadata
+from django.contrib.auth.decorators import login_required
 import logging
 import copy
 
@@ -28,6 +29,7 @@ def get_fields(image=None):
     ]
 
 
+@login_required
 def index(request):
     template = loader.get_template("images/index.html")
     context = {
@@ -44,6 +46,7 @@ def index(request):
     return HttpResponse(template.render(context, request))
 
 
+@login_required
 def images(request, index):
     template = loader.get_template("images/image.html")
     context = {
@@ -66,6 +69,7 @@ def images(request, index):
     return HttpResponse(template.render(context, request))
 
 
+@login_required
 def new_image(request):
     template = loader.get_template("images/image.html")
     context = {
@@ -79,6 +83,7 @@ def new_image(request):
     return HttpResponse(template.render(context, request))
 
 
+@login_required
 def api(request, index):
     if request.method == 'POST':
         display_name = request.POST.get('display_name')

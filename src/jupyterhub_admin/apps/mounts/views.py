@@ -2,6 +2,7 @@ from django.http import HttpResponse
 from django.template import loader
 from django.urls import reverse
 from jupyterhub_admin.metadata import get_config_metadata, write_config_metadata
+from django.contrib.auth.decorators import login_required
 import logging
 import copy
 
@@ -50,6 +51,7 @@ def get_fields(mount=None):
     ]
 
 
+@login_required
 def index(request):
     template = loader.get_template("mounts/index.html")
     context = {
@@ -75,6 +77,7 @@ def index(request):
     return HttpResponse(template.render(context, request))
 
 
+@login_required
 def mounts(request, index):
     template = loader.get_template("mounts/mount.html")
     context = {
@@ -97,6 +100,7 @@ def mounts(request, index):
     return HttpResponse(template.render(context, request))
 
 
+@login_required
 def new_mount(request):
     template = loader.get_template("mounts/mount.html")
     context = {
@@ -110,6 +114,7 @@ def new_mount(request):
     return HttpResponse(template.render(context, request))
 
 
+@login_required
 def api(request, index):
     if request.method == 'POST':
         try:
