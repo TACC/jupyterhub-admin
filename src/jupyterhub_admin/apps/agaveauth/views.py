@@ -28,6 +28,8 @@ def _get_auth_state():
 
 
 def _get_redirect_uri(request):
+    logger.debug("AgaveOauth Request")
+    logger.debug(request.META)
     redirect_uri = 'https://{}{}'
     if request.get_host() == "localhost:8000":
         redirect_uri = 'http://{}{}'
