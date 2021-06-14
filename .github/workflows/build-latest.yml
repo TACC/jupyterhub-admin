@@ -1,4 +1,4 @@
-name: Build container on pull request
+name: Build latest container on pull request to dev
 on:
   pull_request:
     branches: [ dev ]

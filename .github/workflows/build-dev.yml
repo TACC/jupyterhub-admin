@@ -1,4 +1,4 @@
-name: Build on push to master
+name: Build dev container on push to dev
 on:
   push:
     branches: [ dev ]

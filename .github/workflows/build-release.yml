@@ -1,4 +1,4 @@
-name: Build staging on push to main
+name: Build release tagged image on release
 on:
   release:
     types: [created,edited]
