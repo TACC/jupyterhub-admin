@@ -2,8 +2,6 @@ name: Build release tagged image on release
 on:
   release:
     types: [created,edited]
-  push:
-    branches: [ main ]
 
 jobs:
   build_commit:
