@@ -21,11 +21,20 @@ jobs:
           echo $SHORTSHA
         env: 
           SHORTSHA: ${{ steps.vars.outputs.sha_short }}     
+      - name: Get version
+        id: get_version
+        run: |
+          echo ::set-output name=version::$(echo $GITHUB_REF | cut -d / -f 3)
+      - name: Print version
+        run: |
+          echo $VERSION
+        env:
+          VERSION: ${{ steps.get_version.outputs.version }}
       - uses: mr-smithers-excellent/docker-build-push@v3
         name: Build & push commit tagged Docker image
         with:
           image: ${{ secrets.DOCKERHUB_REPO }}
-          tag: ${GITHUB_REF}  
+          tag: ${{ steps.get_version.outputs.version }} 
           registry: docker.io
           dockerfile: Dockerfile
           username: ${{ secrets.DOCKERHUB_USERNAME }}
