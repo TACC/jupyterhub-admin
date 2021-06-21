@@ -6,9 +6,12 @@ from jupyterhub_admin.jhub_api import (
     stop_server,
     parse_user,
     has_server,
-    start_server
+    start_server,
+    get_user_token
 )
 from django.contrib.auth.decorators import login_required
+from django.conf import settings
+from django.shortcuts import redirect
 import dateutil.parser
 import logging
 
@@ -107,4 +110,13 @@ def server(request, username):
         except Exception as e:
             logger.error(f"Start server failed for {username}")
             logger.exception(e)
-            return HttpResponse(status=500) 
+            return HttpResponse(status=500)
+
+@login_required
+def terminal(request, username):
+    try:
+        response = get_user_token(username)
+        token = response['token']
+        return redirect(f"{settings.JUPYTERHUB_SERVER}/user/{username}/terminals/1?token={token}")
+    except Exception as e:
+        return HttpResponse(status=500)

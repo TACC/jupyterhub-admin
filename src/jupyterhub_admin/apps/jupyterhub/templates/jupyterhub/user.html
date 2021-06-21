@@ -24,6 +24,11 @@
         <dt>Last Activity</dt>
         <dd>{{ user.server.last_activity }}</dd>
       </dl>
+      <a href="{% url 'jupyterhub:terminal' username=user.name %}"
+        target="_blank" 
+        class="btn btn-secondary active" role="button" aria-pressed="true">
+        User Terminal
+      </a>
       <button class="btn btn-danger" id="stopServerButton">Stop Server</button>
     {% else %}
       <div>
