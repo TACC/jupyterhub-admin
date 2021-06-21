@@ -24,48 +24,66 @@
         <dt>Last Activity</dt>
         <dd>{{ user.server.last_activity }}</dd>
       </dl>
-      <button id="stopServerButton">Stop Server</button>
-      <div class="spinner-border" role="status" id="stopServerSpinner">
-        <span class="sr-only">Loading...</span>
-      </div>
-      <div id="stopServerError">
-        Error while trying to stop server
-      </div>
+      <button class="btn btn-danger" id="stopServerButton">Stop Server</button>
     {% else %}
-      <i>This user is currently inactive, and does not have a running server.</i>
+      <div>
+        <i>This user is currently inactive, and does not have a running server.</i>
+      </div>      
+      <!-- 
+        <button class="btn btn-primary" id="startServerButton">Start Server</button>
+      -->
     {% endif %}
+    <div class="spinner-border" role="status" id="serverSpinner">
+      <span class="sr-only">Loading...</span>
+    </div>
+    <div id="serverError">
+      Error while performing operation on user's server
+    </div>
   {% endif %}
 {% endblock %}
 {% block scripts %}
 <script>
-  function stopServerSuccess(data, textStatus, jqXHR) {
+  function serverSuccess(data, textStatus, jqXHR) {
     console.log("stop server success", textStatus);
     window.location.reload();
   }
-  function stopServerError(jqXHR, textStatus, errorThrown) {
+  function serverError(jqXHR, textStatus, errorThrown) {
     console.log("stop server error", errorThrown);
-    $("#stopServerError").show();
+    $("#serverError").show();
   }
   $(document).ajaxSend(function() {
-    $("#stopServerSpinner").show();
-    $("#stopServerError").hide();
+    $("#serverSpinner").show();
+    $("#serverError").hide();
     $("#stopServerButton").prop("disabled", true);
+    $("#startServerButton").prop("disabled", true);
   });
   $(document).ajaxStop(function() {
-    $("#stopServerSpinner").hide();
+    $("#serverSpinner").hide();
     $("#stopServerButton").prop("disabled", false);
+    $("#startServerButton").prop("disabled", false);
   })
   $(document).ready(function() {
-    $("#stopServerSpinner").hide();
-    $("#stopServerError").hide();
+    $("#serverSpinner").hide();
+    $("#serverError").hide();
     $("#stopServerButton").click(function() {
       $.ajax(
         "{% url 'jupyterhub:server' username=user.name %}",
         {
           method: 'DELETE',
           headers: {'X-CSRFToken': '{{ csrf_token }}'},
-          success: stopServerSuccess,
-          error: stopServerError
+          success: serverSuccess,
+          error: serverError
+        }
+      )
+    });
+    $("#startServerButton").click(function() {
+      $.ajax(
+        "{% url 'jupyterhub:server' username=user.name %}",
+        {
+          method: 'POST',
+          headers: {'X-CSRFToken': '{{ csrf_token }}'},
+            success: serverSuccess,
+            error: serverError 
         }
       )
     });

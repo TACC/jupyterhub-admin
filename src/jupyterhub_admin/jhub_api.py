@@ -30,6 +30,8 @@ def get_user(username):
 def stop_server(username):
     return jupyterhub_request('DELETE', f'/users/{username}/server')
 
+def start_server(username):
+    return jupyterhub_request('POST', f'/users/{username}/server')
 
 def parse_user(user):
     """

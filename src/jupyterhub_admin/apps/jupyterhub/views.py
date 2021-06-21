@@ -5,7 +5,8 @@ from jupyterhub_admin.jhub_api import (
     get_user,
     stop_server,
     parse_user,
-    has_server
+    has_server,
+    start_server
 )
 from django.contrib.auth.decorators import login_required
 import dateutil.parser
@@ -86,8 +87,24 @@ def server(request, username):
             logger.info(f"Stop server requested for {username}")
             result = stop_server(username)
             logger.info(f"Stop server successful for {username}")
+            if result.status_code != 200:
+                raise Exception(result.text)
+            logger.info(result)
             return HttpResponse("OK")
         except Exception as e:
             logger.error(f"Stop server failed for {username}")
-            logger.exception()
+            logger.exception(e)
             return HttpResponse(status=500)
+    elif request.method == 'POST':
+        try:
+            logger.info(f"Start server requested for {username}")
+            result = start_server(username)
+            if result.status_code != 200:
+                raise Exception(result.text)
+            logger.info(f"Start server successful for {username}")
+            logger.info(result)
+            return HttpResponse("OK")
+        except Exception as e:
+            logger.error(f"Start server failed for {username}")
+            logger.exception(e)
+            return HttpResponse(status=500) 
