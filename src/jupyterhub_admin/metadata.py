@@ -43,6 +43,24 @@ def write_group_config_metadata(group, value):
     ag.meta.updateMetadata(body=meta, uuid=meta['uuid'])
 
 
+def new_group_config(group):
+    ag = get_agave_client()
+    meta = {
+        "name": get_group_config_metadata_name(group),
+        "value": {
+            "tenant": settings.TENANT,
+            "instance": settings.INSTANCE,
+            "user": [],
+            "images": [],
+            "config_type": "group",
+            "volume_mounts": [],
+            "group_name": group,
+            "name": get_group_config_metadata_name(group)
+        }
+    }
+    ag.meta.addMetadata(body=meta)
+
+
 def write_config_metadata(value):
     ag = get_agave_client()
     meta = get_config_metadata()
