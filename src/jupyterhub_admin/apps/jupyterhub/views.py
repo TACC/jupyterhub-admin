@@ -113,10 +113,10 @@ def server(request, username):
             return HttpResponse(status=500)
 
 @login_required
-def terminal(request, username):
+def view_server(request, username):
     try:
         response = get_user_token(username)
         token = response['token']
-        return redirect(f"{settings.JUPYTERHUB_SERVER}/user/{username}/terminals/1?token={token}")
+        return redirect(f"{settings.JUPYTERHUB_SERVER}/user/{username}/?token={token}")
     except Exception as e:
         return HttpResponse(status=500)
