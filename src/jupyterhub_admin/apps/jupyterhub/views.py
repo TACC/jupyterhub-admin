@@ -89,10 +89,10 @@ def server(request, username):
         try:
             logger.info(f"Stop server requested for {username}")
             result = stop_server(username)
-            logger.info(f"Stop server successful for {username}")
-            if result.status_code != 200:
+            if not (result.status_code >= 200 and result.status_code < 300):
+                logger.info(result)
                 raise Exception(result.text)
-            logger.info(result)
+            logger.info(f"Stop server successful for {username}")
             return HttpResponse("OK")
         except Exception as e:
             logger.error(f"Stop server failed for {username}")
@@ -102,10 +102,10 @@ def server(request, username):
         try:
             logger.info(f"Start server requested for {username}")
             result = start_server(username)
-            if result.status_code != 200:
+            if not (result.status_code >= 200 and result.status_code < 300):
+                logger.info(result)
                 raise Exception(result.text)
             logger.info(f"Start server successful for {username}")
-            logger.info(result)
             return HttpResponse("OK")
         except Exception as e:
             logger.error(f"Start server failed for {username}")

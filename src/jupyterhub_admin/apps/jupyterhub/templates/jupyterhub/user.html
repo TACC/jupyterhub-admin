@@ -50,7 +50,7 @@
 <script>
   function serverSuccess(data, textStatus, jqXHR) {
     console.log("stop server success", textStatus);
-    window.location.reload();
+    setTimeout(() => window.location.reload(), 2000);
   }
   function serverError(jqXHR, textStatus, errorThrown) {
     console.log("stop server error", errorThrown);
