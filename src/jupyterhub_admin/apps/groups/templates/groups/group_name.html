@@ -1,0 +1,109 @@
+<div class="modal" role="dialog" id="newGroupModal">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">User Group</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label>Please enter a name for the user group</label>
+          <input
+            id="newGroupName"
+            class="form-control"
+            type="text"
+            value="{{ field.value }}"
+            placeholder="{{ field.placeholder }}"/>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <div class="spinner-border" role="status" id="loadingSpinner">
+          <span class="sr-only">Saving user group...</span>
+        </div>
+        <div id="validationMessage">
+        </div>
+        <div id="saveError">
+          Error trying to save group
+        </div>
+        <button type="button" class="btn btn-primary" id="confirmNewGroup" disabled=true>Save</button>
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+  const existing = [
+    {% for group in groups %}
+      "{{ group.group }}"
+    {% endfor %}
+  ];
+
+  function saveSuccess(data, textStatus, jqXHR) {
+    window.location.assign(data.url);
+  }
+
+
+  function saveFailure(jqXHR, textStatus, errorThrown) {
+    // Upon failing to save or delete an item, show the error
+    $("#saveError").show();
+  }
+
+  function validateGroupName() {
+    const name = $("#newGroupName").val().toLowerCase().trim();
+    let valid = true;
+    if (name.length < 3) {
+      $("#validationMessage").text("Name must be three characters or greater");
+      valid = false;
+    }
+    if (['new', 'create', 'api'].includes(name)) {
+      $("#validationMessage").text("Name cannot be 'new', 'create' or 'api'");
+      valid = false;
+    }
+    if (existing.includes(name)) {
+      $("#validationMessage").text("Name is already taken");
+      valid = false;
+    }
+    if (valid) {
+      $("#validationMessage").text("");
+    }
+    $("#confirmNewGroup").prop("disabled", !valid);
+  }
+
+  function createGroup() {
+      $.ajax(
+        "{% url 'groups:create_group' %}",
+        {
+          method: 'POST',
+          headers: {'X-CSRFToken': '{{ csrf_token }}', 'Content-Type':'application/json'},
+          data: JSON.stringify({ 'group': $("#newGroupName").val().toLowerCase().trim() }), 
+          success: saveSuccess,
+          error: saveFailure
+        }
+      )
+    }
+
+  $(document).ajaxSend(function() {
+    // Before sending any ajax calls, show the loading spinner and disable buttons
+    $("#loadingSpinner").show();
+    $("#saveError").hide();
+    $("#confirmNewGroup").prop("disabled", true);
+    $("#newGroupName").prop("disabled", true);
+  });
+
+  $(document).ajaxStop(function() {
+    // After sending ajax calls, hide the loading spinner and enable buttons
+    $("#loadingSpinner").hide();
+    $("#confirmNewGroup").prop("disabled", false);
+    $("#newGroupName").prop("disabled", false);
+  })
+
+  $(document).ready(function() {
+    $("#newGroupName").change(validateGroupName);
+    $("#newGroupName").keyup(validateGroupName);
+    $("#loadingSpinner").hide();
+    $("#saveError").hide();
+    $("#confirmNewGroup").click(createGroup);
+  });
+</script>
