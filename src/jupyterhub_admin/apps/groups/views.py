@@ -1,7 +1,11 @@
 from django.http import HttpResponse, JsonResponse
 from django.template import loader
 from django.urls import reverse
-from jupyterhub_admin.metadata import list_group_config_metadata
+from jupyterhub_admin.metadata import (
+    list_group_config_metadata,
+    write_group_config_metadata,
+    create_group_config_metadata
+)
 from django.contrib.auth.decorators import login_required
 import logging
 import json
@@ -31,15 +35,13 @@ def index(request):
     }
     try:
         metadata = list_group_config_metadata()
-        existing = json.dumps([ group['group'] for group in metadata])
-        print("EXISTING", existing);
+        print(metadata)
         context['groups'] = [
             {
-                'group': group['group'],
-                'users': len(group['user']),
-                'images': len(group['images']),
-                'volume_mounts': len(group['volume_mounts']),
-                'existing': existing
+                'group': group['value']['group_name'],
+                'users': len(group['value']['user']),
+                'images': len(group['value']['images']),
+                'volume_mounts': len(group['value']['volume_mounts']),
             } for group in metadata
         ]
     except Exception as e:
@@ -51,43 +53,17 @@ def index(request):
 
 @login_required
 def groups(request, group):
-    pass
-"""
-    template = loader.get_template("images/image.html")
-    context = {
-        'error': False,
-        'index': index,
-        'header': "JupyterHub Image Configuration",
-        'fields': [],
-        'api': reverse('images:api', args=[str(index)])
-    }
-    try:
-        metadata = get_config_metadata()
-        image = metadata['value']['images'][index]
-        context['fields'] = get_fields(image)
-        context['message'] = f"Configuration for {image['display_name']}" 
-        context['delete_confirmation'] = f"{image['display_name']} ({image['name']})"
-    except Exception as e:
-        context['error'] = True
-        context['message'] = 'Could not retrieve JupyterHub Image'
-        logger.exception(e)
-    return HttpResponse(template.render(context, request))
-"""
+    #template = loader.get_template("images/image.html")
+    return HttpResponse(group)
+
 @login_required
-def new_image(request):
-    template = loader.get_template("groups/group.html")
-    metadata = list_group_config_metadata()
-    existing = [ group['group'] for group in metadata ]
-    context = {
-        'error': False,
-        'group': 'new',
-        'existing': existing,
-        'fields': get_fields(),
-        'api': reverse('groups:api', args=["group"]),
-        'header': f"User Group Settings",
-        'message': f"Add a new User Group",
-    }
-    return HttpResponse(template.render(context, request))
+def create_group(request):
+    content = json.loads(request.body)
+    group = content['group']
+    create_group_config_metadata(group)
+    url = reverse('groups:groups', args=[group])
+    print(url)
+    return JsonResponse({ 'url': url })
 
 
 @login_required

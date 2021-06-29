@@ -43,7 +43,7 @@ def write_group_config_metadata(group, value):
     ag.meta.updateMetadata(body=meta, uuid=meta['uuid'])
 
 
-def new_group_config(group):
+def create_group_config_metadata(group):
     ag = get_agave_client()
     meta = {
         "name": get_group_config_metadata_name(group),
