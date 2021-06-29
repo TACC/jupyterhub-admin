@@ -1,22 +1,90 @@
-{% extends "crud.html" %}
+{% extends "base.html" %}
 {% block content %}
-<h3>Images</h3>
-<h3>Volume Mounts</h3>
+{% if error == True %}
+<div class="alert alert-danger" role="alert">
+  {{ message }}
+</div>
+{% else %}
+  <h3>User Group: {{ group.group_name }} </h3>
+  <div>
+    <button 
+      type="submit" 
+      class="btn btn-secondary" 
+      id="newGroupButton" 
+      data-toggle="modal" 
+      data-target="#groupNameModal"
+    >
+      Rename
+    </button>
+    <button
+      type="submit"
+      class="btn btn-danger"
+      data-toggle="modal" 
+      data-target="#deleteModal"
+    >
+      Delete
+    </button>
+  </div>
+{% endif %}
 {% endblock %}
-{% block callbacks %}
+{% block scripts %}
+{% include "groups/group_name.html" %}
+<div class="modal" role="dialog" id="deleteModal">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Confirm User Group Delete</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <p>Are you sure you wish to delete user group <b>{{ group.group_name }}</b>?</p>
+      </div>
+      <div class="modal-footer">
+        <div class="spinner-border" role="status" id="deleteGroupLoadingSpinner">
+          <span class="sr-only">Deleting user group...</span>
+        </div>
+        <div id="deleteGroupError">
+          Error trying to delete group
+        </div>
+        <button type="button" class="btn btn-danger" id="confirmDelete" data-dismiss="modal">Delete</button>
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+      </div>
+    </div>
+  </div>
+</div>
 <script>
-  function validate(formData) {
-    // Validate inputs
-    const display_name = formData.display_name; 
-    const image_name = formData.image_name;
-    const re = RegExp("^(?:(?=[^:\/]{1,253})(?!-)[a-zA-Z0-9-]{1,63}(?<!-)(?:\.(?!-)[a-zA-Z0-9-]{1,63}(?<!-))*(?::[0-9]{1,5})?/)?((?![._-])(?:[a-z0-9._-]*)(?<![._-])(?:/(?![._-])[a-z0-9._-]*(?<![._-]))*)(?::(?![.-])[a-zA-Z0-9_.-]{1,128})?");
-    return (display_name && display_name.length > 0 && image_name && re.test(image_name));
+  function deleteSuccess(data, textStatus, jqXHR) {
+    $("#deleteGroupError").hide();
+    $("#deleteGroupLoadingSpinner").show();
+    window.location.assign("{% url 'groups:index' %}");
   }
 
-  function saveRedirect(data, textStatus, jqXHR) {
-    console.log(data);
-    // Upon successfully saving an image, redirect back to images list
-    //window.location.assign("{% url 'groups:groups' group=group %}");
+  function deleteFailure(jqXHR, textStatus, errorThrown) {
+    // Upon failing to save or delete an item, show the error
+    $("#deleteGroupError").show();
+    $("#deleteGroupLoadingSpinner").hide();
   }
+
+  function deleteGroup() {
+    $("#deleteGroupLoadingSpinner").show();
+    $("#deleteGroupError").hide();
+    $("#confirmDelete").attr('disabled', true);
+    $.ajax(
+      "{% url 'groups:delete_group' %}",
+      {
+        method: 'POST',
+        headers: {'X-CSRFToken': '{{ csrf_token }}', 'Content-Type':'application/json'},
+        data: JSON.stringify({ 'group': '{{ group.group_name }}' }), 
+        success: deleteSuccess,
+        error: deleteFailure
+      }
+    )
+  }
+
+  $("#deleteGroupLoadingSpinner").hide();
+  $("#deleteGroupError").hide();
+  $("#confirmDelete").click(deleteGroup);
 </script>
 {% endblock %}

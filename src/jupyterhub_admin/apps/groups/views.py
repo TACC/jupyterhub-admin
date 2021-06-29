@@ -4,7 +4,10 @@ from django.urls import reverse
 from jupyterhub_admin.metadata import (
     list_group_config_metadata,
     write_group_config_metadata,
-    create_group_config_metadata
+    create_group_config_metadata,
+    get_group_config_metadata,
+    rename_group_config_metadata,
+    delete_group_config_metadata
 )
 from django.contrib.auth.decorators import login_required
 import logging
@@ -35,7 +38,6 @@ def index(request):
     }
     try:
         metadata = list_group_config_metadata()
-        print(metadata)
         context['groups'] = [
             {
                 'group': group['value']['group_name'],
@@ -44,6 +46,8 @@ def index(request):
                 'volume_mounts': len(group['value']['volume_mounts']),
             } for group in metadata
         ]
+        context['existing'] = [ group['value']['group_name'] for group in metadata ]
+        context['groupNameApi'] = reverse('groups:create_group')
     except Exception as e:
         context['error'] = True
         context['message'] = 'Groups could not be retrieved'
@@ -53,8 +57,20 @@ def index(request):
 
 @login_required
 def groups(request, group):
-    #template = loader.get_template("images/image.html")
-    return HttpResponse(group)
+    template = loader.get_template("groups/group.html")
+    context = {
+        'error': False,
+    }
+    try:
+        metadata = list_group_config_metadata()
+        context['group'] = get_group_config_metadata(group)['value']
+        context['existing'] = [ group['value']['group_name'] for group in metadata ]
+        context['groupNameApi'] = reverse('groups:rename_group')
+    except Exception as e:
+        context['error'] = True
+        context['message'] = 'ERROR: Group could not be retrieved'
+    return HttpResponse(template.render(context, request))
+
 
 @login_required
 def create_group(request):
@@ -62,8 +78,25 @@ def create_group(request):
     group = content['group']
     create_group_config_metadata(group)
     url = reverse('groups:groups', args=[group])
-    print(url)
     return JsonResponse({ 'url': url })
+
+
+@login_required
+def rename_group(request):
+    content = json.loads(request.body)
+    original = content['previousName']
+    group = content['group']
+    rename_group_config_metadata(original, group)
+    url = reverse('groups:groups', args=[group])
+    return JsonResponse({ 'url': url })
+
+
+@login_required
+def delete_group(request):
+    content = json.loads(request.body)
+    group = content['group']
+    delete_group_config_metadata(group)
+    return JsonResponse({ 'url': reverse('groups:index')})
 
 
 @login_required

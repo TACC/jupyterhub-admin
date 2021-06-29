@@ -1,4 +1,4 @@
-<div class="modal" role="dialog" id="newGroupModal">
+<div class="modal" role="dialog" id="groupNameModal">
   <div class="modal-dialog" role="document">
     <div class="modal-content">
       <div class="modal-header">
@@ -14,17 +14,19 @@
             id="newGroupName"
             class="form-control"
             type="text"
-            value="{{ field.value }}"
-            placeholder="{{ field.placeholder }}"/>
+            {% if group %}
+              value="{{ group.group_name }}"
+            {% endif %}
+          />
         </div>
       </div>
       <div class="modal-footer">
-        <div class="spinner-border" role="status" id="loadingSpinner">
+        <div class="spinner-border" role="status" id="groupNameLoadingSpinner">
           <span class="sr-only">Saving user group...</span>
         </div>
         <div id="validationMessage">
         </div>
-        <div id="saveError">
+        <div id="groupNameError">
           Error trying to save group
         </div>
         <button type="button" class="btn btn-primary" id="confirmNewGroup" disabled=true>Save</button>
@@ -35,8 +37,8 @@
 </div>
 <script>
   const existing = [
-    {% for group in groups %}
-      "{{ group.group }}"
+    {% for group in existing %}
+      "{{ group }}",
     {% endfor %}
   ];
 
@@ -47,7 +49,7 @@
 
   function saveFailure(jqXHR, textStatus, errorThrown) {
     // Upon failing to save or delete an item, show the error
-    $("#saveError").show();
+    $("#groupNameError").show();
   }
 
   function validateGroupName() {
@@ -71,39 +73,41 @@
     $("#confirmNewGroup").prop("disabled", !valid);
   }
 
-  function createGroup() {
-      $.ajax(
-        "{% url 'groups:create_group' %}",
-        {
-          method: 'POST',
-          headers: {'X-CSRFToken': '{{ csrf_token }}', 'Content-Type':'application/json'},
-          data: JSON.stringify({ 'group': $("#newGroupName").val().toLowerCase().trim() }), 
-          success: saveSuccess,
-          error: saveFailure
-        }
-      )
-    }
+  function callGroupNameApi() {
+    $.ajax(
+      "{{ groupNameApi }}",
+      {
+        method: 'POST',
+        headers: {'X-CSRFToken': '{{ csrf_token }}', 'Content-Type':'application/json'},
+        data: JSON.stringify({
+          {% if group and group.group_name %}
+            'previousName': "{{ group.group_name }}",
+          {% endif %}
+          'group': $("#newGroupName").val().toLowerCase().trim() 
+        }), 
+        success: saveSuccess,
+        error: saveFailure
+      }
+    )
+  }
 
   $(document).ajaxSend(function() {
     // Before sending any ajax calls, show the loading spinner and disable buttons
-    $("#loadingSpinner").show();
-    $("#saveError").hide();
+    $("#groupNameLoadingSpinner").show();
+    $("#groupNameError").hide();
     $("#confirmNewGroup").prop("disabled", true);
     $("#newGroupName").prop("disabled", true);
   });
 
   $(document).ajaxStop(function() {
     // After sending ajax calls, hide the loading spinner and enable buttons
-    $("#loadingSpinner").hide();
+    $("#groupNameLoadingSpinner").hide();
     $("#confirmNewGroup").prop("disabled", false);
     $("#newGroupName").prop("disabled", false);
   })
-
-  $(document).ready(function() {
-    $("#newGroupName").change(validateGroupName);
-    $("#newGroupName").keyup(validateGroupName);
-    $("#loadingSpinner").hide();
-    $("#saveError").hide();
-    $("#confirmNewGroup").click(createGroup);
-  });
+  $("#newGroupName").change(validateGroupName);
+  $("#newGroupName").keyup(validateGroupName);
+  $("#groupNameLoadingSpinner").hide();
+  $("#groupNameError").hide();
+  $("#confirmNewGroup").click(callGroupNameApi);
 </script>

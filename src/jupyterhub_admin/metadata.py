@@ -61,8 +61,27 @@ def create_group_config_metadata(group):
     ag.meta.addMetadata(body=meta)
 
 
+def rename_group_config_metadata(original, group):
+    ag = get_agave_client()
+    meta = get_group_config_metadata(original)
+    del meta['uuid']
+    new_meta_name = get_group_config_metadata_name(group)
+    meta['name'] = new_meta_name
+    meta['value']['group_name'] = group
+    meta['value']['name'] = new_meta_name
+    ag.meta.addMetadata(body=meta)
+    delete_group_config_metadata(original)
+
+
+def delete_group_config_metadata(group):
+    ag = get_agave_client()
+    meta = get_group_config_metadata(group)
+    ag.meta.deleteMetadata(uuid=meta['uuid'])
+
+
 def write_config_metadata(value):
     ag = get_agave_client()
+    # TODO fix this
     meta = get_config_metadata()
     meta['value'] = value
     ag.meta.updateMetadata(body=meta, uuid=meta['uuid'])
