@@ -39,7 +39,9 @@ def get_group_config_metadata(group):
 def write_group_config_metadata(group, value):
     ag = get_agave_client()
     meta = get_group_config_metadata(group)
+    print("************** " * 30)
     meta['value'] = value
+    print(meta)
     ag.meta.updateMetadata(body=meta, uuid=meta['uuid'])
 
 

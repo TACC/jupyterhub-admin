@@ -8,5 +8,6 @@ urlpatterns = [
     path('create/', views.create_group, name='create_group'),
     path('rename/', views.rename_group, name='rename_group'),
     path('delete/', views.delete_group, name='delete_group'),
-    path('api/<str:group>', views.api, name='api')
+    path('<str:group>/user/<str:index>', views.user, name='user'),
+    path('api/<str:group>/user/<str:index>', views.user_api, name='user_api')
 ]
