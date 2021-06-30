@@ -8,7 +8,7 @@
   {{ message }}
 </div>
 {% else %}
-  <h3>User Group: {{ group.group_name }} </h3>
+  <h3>User Group {{ group.group_name }} </h3>
   <div>
     <button 
       type="submit" 
@@ -30,24 +30,69 @@
   </div>
   <br />
   <div>
-    <h4>
+    <h5>
       Users
-    </h4>
-    <table border=1 class="table">
-      <tbody>
-        {% for user in group.user %}
-          <tr>
-            <td>
-              <a href="{% url 'groups:user' group=group.group_name index=forloop.counter0 %}">{{ user }}</a>
-            </td>
-          </tr>
-        {% endfor %}
-      </tbody>
-    </table>
+    </h5>
+    {% if group.user|length > 0 %}
+      <table border=1 class="table">
+        <tbody>
+          {% for user in group.user %}
+            <tr>
+              <td>
+                <a href="{% url 'groups:user' group=group.group_name index=forloop.counter0 %}">{{ user }}</a>
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    {% else %}
+      <div>
+        <i>No users</i>
+        <br />
+      </div>
+    {% endif %}
     <div>
       <a
         class="btn btn-primary"
         href="{% url 'groups:user' group=group.group_name index='new'%}">+ Add User</a>
+    </div>
+  </div>
+  <br />
+  <div>
+    <h5>Images</h5>
+    {% if group.images|length > 0 %}
+      <table border=1 class="table">
+        <thead>
+          <tr>
+            <th>Display Name</th>
+            <th>Image Name</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for image in group.images %}
+            <tr>
+              <td>
+                <a href="{% url 'groups:images' group=group.group_name index=forloop.counter0 %}">
+                  {{ image.display_name }}
+                </a>
+              </td>
+              <td>
+                {{ image.name }}
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    {% else %}
+      <div>
+        <i>No images</i>
+        <br />
+      </div>
+    {% endif %}
+    <div>
+      <a
+        class="btn btn-primary"
+        href="{% url 'groups:images' group=group.group_name index='new'%}">+ Add Image</a>
     </div>
   </div>
 {% endif %}

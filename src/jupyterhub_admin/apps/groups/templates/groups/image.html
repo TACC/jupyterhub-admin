@@ -1,0 +1,17 @@
+{% extends "crud.html" %}
+{% block callbacks %}
+<script>
+  function validate(formData) {
+    // Validate inputs
+    const display_name = formData.display_name; 
+    const image_name = formData.image_name;
+    const re = RegExp("^(?:(?=[^:\/]{1,253})(?!-)[a-zA-Z0-9-]{1,63}(?<!-)(?:\.(?!-)[a-zA-Z0-9-]{1,63}(?<!-))*(?::[0-9]{1,5})?/)?((?![._-])(?:[a-z0-9._-]*)(?<![._-])(?:/(?![._-])[a-z0-9._-]*(?<![._-]))*)(?::(?![.-])[a-zA-Z0-9_.-]{1,128})?");
+    return (display_name && display_name.length > 0 && image_name && re.test(image_name));
+  }
+
+  function saveRedirect(data, textStatus, jqXHR) {
+    // Upon successfully saving an image, redirect back to images list
+    window.location.assign(data.url);
+  }
+</script>
+{% endblock %}

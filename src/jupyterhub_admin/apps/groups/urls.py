@@ -9,5 +9,7 @@ urlpatterns = [
     path('rename/', views.rename_group, name='rename_group'),
     path('delete/', views.delete_group, name='delete_group'),
     path('<str:group>/user/<str:index>', views.user, name='user'),
-    path('api/<str:group>/user/<str:index>', views.user_api, name='user_api')
+    path('<str:group>/images/<str:index>', views.images, name='images'),
+    path('api/<str:group>/user/<str:index>', views.user_api, name='user_api'),
+    path('api/<str:group>/images/<str:index>', views.images_api, name='images_api')
 ]

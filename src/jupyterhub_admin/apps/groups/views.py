@@ -101,7 +101,6 @@ def get_user_fields(user):
 
 @login_required
 def user(request, group, index):
-    # TODO process user as 'new' or index
     fields = [
         {
             'label': 'User Name',
@@ -137,6 +136,53 @@ def user(request, group, index):
     return HttpResponse(template.render(context, request))
 
 
+
+@login_required
+def images(request, group, index):
+    fields = [
+        {
+            'label': 'Display Name',
+            'id': 'display_name',
+            'value': '',
+            'type': 'text',
+            'placeholder': "Name of the image to display in the spawner"
+        },
+        {
+            'label': 'Image Name',
+            'id': 'image_name',
+            'value': '',
+            'type': 'text',
+            'placeholder': "Image repository, name and tag"
+        }
+    ]
+    template = loader.get_template("groups/image.html")
+    context = {
+        'error': False,
+        'index': index,
+        'header': f"User Group {group}",
+        'fields': fields,
+        'group': group,
+        'api': reverse('groups:images_api', args=[group, str(index)])
+    }
+    try:
+        meta = get_group_config_metadata(group)
+        if index == 'new':
+            context['message'] = "Add a new image for this group"
+            context['delete_confirmation'] = ""
+        else:
+            image = meta['value']['images'][int(index)]
+            display_name = image['display_name']
+            image_name = image['name']
+            context['fields'][0]['value'] = display_name
+            context['fields'][1]['value'] = image_name
+            context['message'] = f"Edit group image {display_name}"
+            context['delete_confirmation'] = f"image {display_name} from {group}"
+    except Exception as e:
+        context['error'] = True
+        context['message'] = f"Could not retrieve image in group {group}"
+        logger.exception(e)
+    return HttpResponse(template.render(context, request))
+
 @login_required
 def user_api(request, group, index):
     if request.method == 'POST':
@@ -164,3 +210,39 @@ def user_api(request, group, index):
         except Exception as e:
             logger.exception(e)
             return HttpResponse(status=500)
+
+
+
+@login_required
+def images_api(request, group, index):
+    if request.method == 'POST':
+        display_name = request.POST.get('display_name')
+        image_name = request.POST.get('image_name')
+        try:
+            metadata = get_group_config_metadata(group)
+            image = {
+                'display_name': display_name,
+                'name': image_name
+            }
+            if index == 'new':
+                metadata['value']['images'].append(image)
+            else:
+                index = int(index)
+                metadata['value']['images'][index] = image
+            write_group_config_metadata(group, metadata['value'])
+            return JsonResponse(data = {'url': reverse('groups:groups', args=[group])})
+        except Exception as e:
+            logger.exception(e)
+            return HttpResponse(status=500)
+    
+    if request.method == 'DELETE':
+        try:
+            index = int(index)
+            metadata = get_group_config_metadata(group)
+            metadata['value']['images'].pop(index)
+            write_group_config_metadata(group, metadata['value'])
+            return JsonResponse(data = {'url': reverse('groups:groups', args=[group])})
+        except Exception as e:
+            logger.exception(e)
+            return HttpResponse(status=500)
+            
