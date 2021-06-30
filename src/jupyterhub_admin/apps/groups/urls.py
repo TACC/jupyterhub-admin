@@ -10,6 +10,8 @@ urlpatterns = [
     path('delete/', views.delete_group, name='delete_group'),
     path('<str:group>/user/<str:index>', views.user, name='user'),
     path('<str:group>/images/<str:index>', views.images, name='images'),
+    path('<str:group>/mounts/<str:index>', views.mounts, name='mounts'),
     path('api/<str:group>/user/<str:index>', views.user_api, name='user_api'),
-    path('api/<str:group>/images/<str:index>', views.images_api, name='images_api')
+    path('api/<str:group>/images/<str:index>', views.images_api, name='images_api'),
+    path('api/<str:group>/mounts/<str:index>', views.mounts_api, name='mounts_api')
 ]

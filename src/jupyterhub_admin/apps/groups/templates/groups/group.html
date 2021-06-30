@@ -95,6 +95,44 @@
         href="{% url 'groups:images' group=group.group_name index='new'%}">+ Add Image</a>
     </div>
   </div>
+  <br />
+  <div>
+    <h5>Volume Mounts</h5>
+    {% if group.volume_mounts|length > 0 %}
+      <table border=1 class="table">
+        <thead>
+          <tr>
+            <th>Mount Path</th>
+            <th>Host Path</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for mount in group.volume_mounts %}
+            <tr>
+              <td>
+                <a href="{% url 'groups:mounts' group=group.group_name index=forloop.counter0 %}">
+                  {{ mount.mountPath }}
+                </a>
+              </td>
+              <td>
+                {{ mount.path }}
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    {% else %}
+      <div>
+        <i>No volume mounts</i>
+        <br />
+      </div>
+    {% endif %}
+    <div>
+      <a
+        class="btn btn-primary"
+        href="{% url 'groups:mounts' group=group.group_name index='new'%}">+ Add Volume Mount</a>
+    </div>
+  </div>
 {% endif %}
 {% endblock %}
 {% block scripts %}

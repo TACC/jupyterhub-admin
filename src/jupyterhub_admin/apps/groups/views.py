@@ -12,6 +12,7 @@ from jupyterhub_admin.metadata import (
 from django.contrib.auth.decorators import login_required
 import logging
 import json
+from jupyterhub_admin.apps.mounts.views import get_fields as get_mount_fields
 
 
 logger = logging.getLogger(__name__)
@@ -183,6 +184,36 @@ def images(request, group, index):
         logger.exception(e)
     return HttpResponse(template.render(context, request))
 
+
+@login_required
+def mounts(request, group, index):
+    template = loader.get_template("groups/mount.html")
+    context = {
+        'error': False,
+        'index': index,
+        'header': f"User Group {group}",
+        'fields': get_mount_fields(),
+        'group': group,
+        'api': reverse('groups:mounts_api', args=[group, str(index)])
+    }
+    try:
+        if index == 'new':
+            context['message'] = "Add a new volume mount for this group"
+            context['delete_confirmation'] = ""
+        else:
+            index = int(index)
+            metadata = get_group_config_metadata(group)
+            mount = metadata['value']['volume_mounts'][index]
+            context['fields'] = get_mount_fields(mount)
+            context['message'] = f"Configuration for group mount {mount['mountPath']}" 
+            context['delete_confirmation'] = f"{mount['mountPath']} from group {group}"
+    except Exception as e:
+        context['error'] = True
+        context['message'] = 'Could not retrieve group volume mount'
+        logger.exception(e)
+    return HttpResponse(template.render(context, request))
+
+
 @login_required
 def user_api(request, group, index):
     if request.method == 'POST':
@@ -212,7 +243,6 @@ def user_api(request, group, index):
             return HttpResponse(status=500)
 
 
-
 @login_required
 def images_api(request, group, index):
     if request.method == 'POST':
@@ -240,6 +270,42 @@ def images_api(request, group, index):
             index = int(index)
             metadata = get_group_config_metadata(group)
             metadata['value']['images'].pop(index)
+            write_group_config_metadata(group, metadata['value'])
+            return JsonResponse(data = {'url': reverse('groups:groups', args=[group])})
+        except Exception as e:
+            logger.exception(e)
+            return HttpResponse(status=500)
+
+
+@login_required
+def mounts_api(request, group, index):
+    if request.method == 'POST':
+        try:
+            metadata = get_group_config_metadata(group)
+            mount = {
+                'type': request.POST.get('mount_type'),
+                'path': request.POST.get('path'),
+                'mountPath': request.POST.get('mount_path'),
+                'readOnly': "True" if request.POST.get('read_only') == 'true' else "False"
+            }
+            if (mount['type'] == 'nfs'):
+                mount['server'] = request.POST.get('server')
+            if index == 'new':
+                metadata['value']['volume_mounts'].append(mount)
+            else:
+                index = int(index)
+                metadata['value']['volume_mounts'][index] = mount
+            write_group_config_metadata(group, metadata['value'])
+            return JsonResponse(data = {'url': reverse('groups:groups', args=[group])})
+        except Exception as e:
+            logger.exception(e)
+            return HttpResponse(status=500)
+    
+    if request.method == 'DELETE':
+        try:
+            index = int(index)
+            metadata = get_group_config_metadata(group)
+            metadata['value']['volume_mounts'].pop(index)
             write_group_config_metadata(group, metadata['value'])
             return JsonResponse(data = {'url': reverse('groups:groups', args=[group])})
         except Exception as e:

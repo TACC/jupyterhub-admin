@@ -119,7 +119,6 @@ def api(request, index):
     if request.method == 'POST':
         try:
             metadata = get_config_metadata()
-            print(request.POST.get('read_only'))
             mount = {
                 'type': request.POST.get('mount_type'),
                 'path': request.POST.get('path'),
