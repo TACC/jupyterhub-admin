@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %} Workbench {% endblock %}
+{% block head_extra %}
+  <base href="{% url 'main:index' %}">
+{% endblock %}
+{% block styles %}
+  <link rel="stylesheet" href="">
+  <link rel="stylesheet" href="">
+{% endblock %}
+{% block content %}
+  <h3>
+    Groups
+  </h3>
+  <p>
+    Here you can configure user groups for JupyterHub.
+  </p>
+  {% if error == True %}
+    <h4>
+      {{ message }}
+    </h4>
+  {% else %}
+    <table border=1 class="table">
+      <thead>
+        <tr>
+          <th>Group Name</th>
+          <th>Users</th>
+          <th>Images</th>
+          <th>Volume Mounts</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for group in groups %}
+          <tr>
+            <td>
+              <a href="{% url 'groups:groups' group=group.group %}">
+                {{ group.group }}
+              </a>
+            </td>
+            <td>
+              {{ group.users }}
+            </td>
+            <td>
+              {{ group.images }}
+            </td>
+            <td>
+              {{ group.volume_mounts }}
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    <button 
+      type="submit" 
+      class="btn btn-primary" 
+      id="newGroupButton" 
+      data-toggle="modal" 
+      data-target="#groupNameModal"
+    >
+      + New User Group
+    </button>
+  {% endif %}
+{% endblock %}
+{% block scripts %}
+{% include "groups/group_name.html" %}
+{% endblock %}

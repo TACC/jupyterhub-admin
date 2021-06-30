@@ -100,6 +100,7 @@ INSTALLED_APPS = [
     'jupyterhub_admin.apps.images',
     'jupyterhub_admin.apps.mounts',
     'jupyterhub_admin.apps.agaveauth',
+    'jupyterhub_admin.apps.groups',
 ]
 
 MIDDLEWARE = [

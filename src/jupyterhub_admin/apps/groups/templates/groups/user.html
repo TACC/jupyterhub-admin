@@ -1,0 +1,18 @@
+{% extends "crud.html" %}
+{% block precontent %}
+<div>
+  <a href="{% url 'groups:groups' group=group %}">&lt;&lt;&nbsp;Back to {{group}}</a>
+</div>
+{% endblock %}
+{% block callbacks %}
+<script>
+  function validate(formData) {
+    // Validate inputs
+    return true;
+  }
+
+  function saveRedirect(data, textStatus, jqXHR) {
+    window.location.assign(data.url);
+  }
+</script>
+{% endblock %}
