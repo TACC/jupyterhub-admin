@@ -25,7 +25,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/3.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', None) 
+SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', None)
 if not SECRET_KEY:
     logger.warning("Missing DJANGO_SECRET_KEY environment variable. Generating random secret key.")
 SECRET_KEY = get_random_secret_key()
@@ -66,6 +66,22 @@ AGAVE_CLIENT_KEY = os.environ.get('AGAVE_CLIENT_KEY', None)
 AGAVE_CLIENT_SECRET = os.environ.get('AGAVE_CLIENT_SECRET', None)
 if not AGAVE_CLIENT_KEY or not AGAVE_CLIENT_SECRET:
     logger.warning("Missing AGAVE_CLIENT_KEY or AGAVE_CLIENT_SECRET environment variable")
+
+# Agave API for Metadata
+TAPIS_API = os.environ.get('TAPIS_API', None)
+if not TAPIS_API:
+    logger.warning("Missing TAPIS_API environment variable")
+
+# Agave token for Jupyterh account
+TAPIS_SERVICE_TOKEN = os.environ.get('TAPIS_SERVICE_TOKEN', None)
+if not TAPIS_SERVICE_TOKEN:
+    logger.warning("Missing TAPIS_SERVICE_TOKEN environment variable")
+
+# Agave login client key and secret
+TAPIS_CLIENT_KEY = os.environ.get('TAPIS_CLIENT_KEY', None)
+TAPIS_CLIENT_SECRET = os.environ.get('TAPIS_CLIENT_SECRET', None)
+if not TAPIS_CLIENT_KEY or not TAPIS_CLIENT_SECRET:
+    logger.warning("Missing TAPIS_CLIENT_KEY or TAPIS_CLIENT_SECRET environment variable")
 
 ALLOWED_HOSTS = ['*']
 # Setup support for proxy headers
