@@ -5,6 +5,7 @@ from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.contrib.auth.backends import ModelBackend
 from jupyterhub_admin.metadata import get_config_metadata
+import jwt
 
 #pylint: disable=invalid-name
 logger = logging.getLogger(__name__)
@@ -14,16 +15,30 @@ class AgaveOAuthBackend(ModelBackend):
     def authenticate(self, *args, **kwargs):
         user = None
         try:
-            if 'backend' not in kwargs or kwargs['backend'] != 'agave':
+            if 'backend' not in kwargs or kwargs['backend'] != 'tapis':
                 raise Exception('Skipping AgaveOAuthBackend')
             token = kwargs['token']
-            base_url = getattr(settings, 'AGAVE_API')
+            logger.debug(token)
+            base_url = getattr(settings, 'TAPIS_API')
 
-            logger.info('Attempting login via Agave with token "%s"' %
+            #tenant_res = requests.get("https://admin.tapis.io/v3/tenants/jupyter-tacc-dev")
+            #tenant_json = tenant_res.json()
+            #pub_key = tenant_json['result']['public_key']
+
+            #decoded_jwt = jwt.decode(token, pub_key, algorithms=["RS256"])
+
+            logger.info('Attempting login via Tapis with token "%s"' %
                             token[:8].ljust(len(token), '-'))
-            response = requests.get('%s/profiles/v2/me' % base_url,
+
+            #logger.debug(decoded_jwt)
+            #username = decoded_jwt['tapis/username']
+            response = requests.get('%s/oauth2/profiles/me' % (base_url),
                                     headers={'Authorization': 'Bearer %s' % token})
+
+            logger.debug("response %s" % response)
             json_result = response.json()
+            logger.debug(json_result)
+            
             if 'status' not in json_result or json_result['status'] != 'success':
                 raise Exception('Agave Authentication failed: %s' % json_result)
             agave_user = json_result['result']
