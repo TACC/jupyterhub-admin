@@ -72,23 +72,29 @@ TAPIS_API = os.environ.get('TAPIS_API', None)
 if not TAPIS_API:
     logger.warning("Missing TAPIS_API environment variable")
 
-# Agave token for Jupyterh account
+# Tapis token for Jupyterh account
 TAPIS_SERVICE_TOKEN = os.environ.get('TAPIS_SERVICE_TOKEN', None)
 if not TAPIS_SERVICE_TOKEN:
     logger.warning("Missing TAPIS_SERVICE_TOKEN environment variable")
 
-# Agave login client key and secret
+# Tapis login client key and secret
+TAPIS_CLIENT_ID = os.environ.get('TAPIS_CLIENT_ID', None)
 TAPIS_CLIENT_KEY = os.environ.get('TAPIS_CLIENT_KEY', None)
-TAPIS_CLIENT_SECRET = os.environ.get('TAPIS_CLIENT_SECRET', None)
-if not TAPIS_CLIENT_KEY or not TAPIS_CLIENT_SECRET:
-    logger.warning("Missing TAPIS_CLIENT_KEY or TAPIS_CLIENT_SECRET environment variable")
+if not TAPIS_CLIENT_ID or not TAPIS_CLIENT_KEY:
+    logger.warning("Missing TAPIS_CLIENT_ID or TAPIS_CLIENT_KEY environment variable")
+
+# User login information
+TAPIS_USER = os.environ.get('TAPIS_USER', None)
+TAPIS_PASS = os.environ.get('TAPIS_PASS', None)
+if not TAPIS_USER or not TAPIS_PASS:
+    logger.warning("Missing TAPIS_USER or TAPIS_PASS environment variable")
 
 ALLOWED_HOSTS = ['*']
 # Setup support for proxy headers
 USE_X_FORWARDED_HOST = True
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
-LOGIN_URL = '/auth/agave'
+LOGIN_URL = '/auth/tapis'
 LOGIN_REDIRECT_URL = '/'
 
 STATIC_URL = '/static/'
@@ -179,7 +185,7 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 
-AUTHENTICATION_BACKENDS = ['jupyterhub_admin.apps.agaveauth.backends.AgaveOAuthBackend',
+AUTHENTICATION_BACKENDS = ['jupyterhub_admin.apps.agaveauth.backends.TapisOAuthBackend',
                            'django.contrib.auth.backends.ModelBackend']
 
 
