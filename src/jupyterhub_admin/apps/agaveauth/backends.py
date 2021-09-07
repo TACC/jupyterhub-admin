@@ -22,7 +22,8 @@ class TapisOAuthBackend(ModelBackend):
 
             try:
                 user_info = t.authenticator.get_userinfo()
-            except:
+            except Exception as e:
+                logger.exception(e)
                 raise Exception('Tapis Authentication failed')
 
             username = user_info.username
