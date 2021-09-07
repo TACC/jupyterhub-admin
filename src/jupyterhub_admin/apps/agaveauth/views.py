@@ -57,8 +57,6 @@ def tapis_oauth(request):
         session['next'] = next_page
     redirect_uri = _get_redirect_uri(request)
 
-    METRICS.debug(request.GET.get('state'))
-
     METRICS.debug("user:{} starting oauth redirect login".format(request.user.username))
 
     authorization_url = (
