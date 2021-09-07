@@ -31,9 +31,6 @@ def _get_auth_state():
 
 
 def _get_redirect_uri(request):
-    logger.debug("TapisOauth Request")
-    logger.debug("METADATA:")
-    logger.debug(request.META)
     redirect_uri = 'https://{}{}'
     if request.get_host() == "localhost:8000":
         redirect_uri = 'http://{}{}'
@@ -41,7 +38,6 @@ def _get_redirect_uri(request):
         request.get_host(),
         reverse('auth:tapis_oauth_callback')
     )
-    logger.debug(redirect_uri)
     return redirect_uri
 
 
@@ -73,18 +69,13 @@ def tapis_oauth(request):
             session['auth_state'],
         )
     )
-    logger.debug(authorization_url)
     return HttpResponseRedirect(authorization_url)
 
 
 def tapis_oauth_callback(request):
     """Tapis OAuth callback handler.
     """
-    logger.debug("Tapis OAuth callback")
-
     state = request.GET.get('state')
-
-    logger.debug(request.session['auth_state'])
 
     if request.session['auth_state'] != state:
         msg = ('OAuth Authorization State mismatch!? auth_state=%s '
@@ -109,12 +100,8 @@ def tapis_oauth_callback(request):
 
         token = t.access_token.access_token
 
-        logger.debug("METADATA: ")
-        logger.debug(request.META)
-
         # log user in
         user = authenticate(backend='tapis', t=t)
-        logger.debug("user info: {}".format(user))
 
         if user:
             login(request, user)
