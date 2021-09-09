@@ -59,7 +59,7 @@ def index(request):
         context['users'] = [ format_user(user) for user in users ]
     except Exception as e:
         context['error'] = True
-        logger.exception()
+        logger.exception(e)
     return HttpResponse(template.render(context, request))
 
 
@@ -75,7 +75,7 @@ def user(request, username):
     except Exception as e:
         context['error'] = True
         context['message'] = f'Unable to retrieve JupyterHub user information for {username}'
-        logger.exception()
+        logger.exception(e)
     return HttpResponse(template.render(context, request))
 
 
@@ -89,5 +89,5 @@ def server(request, username):
             return HttpResponse("OK")
         except Exception as e:
             logger.error(f"Stop server failed for {username}")
-            logger.exception()
+            logger.exception(e)
             return HttpResponse(status=500)

@@ -18,15 +18,29 @@ class TapisOAuthBackend(ModelBackend):
         try:
             if 'backend' not in kwargs or kwargs['backend'] != 'tapis':
                 raise Exception('Skipping TapisOAuthBackend')
-            t = kwargs['t']
+            token = kwargs['token']
+            base_url = kwargs['base_url']
+
+            user_info_url = "%s/oauth2/userinfo" % base_url
+            headers = {
+                "Content-Type":"application/json",
+                "x-tapis-token":token
+            }
+
+            user_info = None
 
             try:
-                user_info = t.authenticator.get_userinfo()
+                response = requests.get(
+                    user_info_url,
+                    headers=headers
+                )
+                logger.debug(response.json())
+                user_info = response.json()
             except Exception as e:
                 logger.exception(e)
                 raise Exception('Tapis Authentication failed')
 
-            username = user_info.username
+            username = user_info['result']['username']
             meta = get_config_metadata()
             if 'admin_users' not in meta['value'] or username not in meta['value']['admin_users']:
                 raise Exception('%s is not a hub admin user' % username)

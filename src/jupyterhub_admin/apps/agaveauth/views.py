@@ -6,6 +6,7 @@ import time
 import requests
 import secrets
 import base64
+import json
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
@@ -14,7 +15,6 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.http import HttpResponseRedirect, HttpResponseBadRequest, HttpResponse
 from django.shortcuts import render
 from requests.auth import HTTPBasicAuth
-from tapipy.tapis import Tapis
 
 
 logger = logging.getLogger(__name__)
@@ -57,8 +57,6 @@ def tapis_oauth(request):
         session['next'] = next_page
     redirect_uri = _get_redirect_uri(request)
 
-    METRICS.debug("user:{} starting oauth redirect login".format(request.user.username))
-
     authorization_url = (
         '%s/oauth2/authorize?client_id=%s&redirect_uri=%s&response_type=code&state=%s' % (
             tenant_base_url,
@@ -86,20 +84,43 @@ def tapis_oauth_callback(request):
         METRICS.debug('redirect_uri %s', redirect_uri)
 
         code = request.GET['code']
+
         tenant_base_url = getattr(settings, 'TAPIS_API')
-        tenant_base_url = "https://jupyter-tacc-dev.tapis.io"
-        tapis_user = getattr(settings, 'TAPIS_USER')
-        tapis_pass = getattr(settings, 'TAPIS_PASS')
+        client_id = getattr(settings, 'TAPIS_CLIENT_ID')
+        client_key = getattr(settings, 'TAPIS_CLIENT_KEY')
 
-        t = Tapis(base_url=tenant_base_url,
-                  username=tapis_user,
-                  password=tapis_pass)
-        t.get_tokens()
+        credentials = client_id + ":" + client_key
+        cred_bytes = credentials.encode('ascii')
+        cred_encoded = base64.b64encode(cred_bytes)
+        cred_encoded_string = cred_encoded.decode('ascii')
 
-        token = t.access_token.access_token
+        body = {
+            "grant_type":"authorization_code",
+            "code":code,
+            "redirect_uri":redirect_uri
+        }
+
+        headers = {
+            "Authorization":"Basic %s" % cred_encoded_string
+        }
+
+        url = '%s/oauth2/tokens' % tenant_base_url
+
+        data = None
+        try:
+            response = requests.post(
+                url,
+                json=body,
+                headers=headers
+            )
+            data = response.json()
+        except Exception as e:
+            logger.debug(e)
+
+        token = data['result']['access_token']['access_token']
 
         # log user in
-        user = authenticate(backend='tapis', t=t)
+        user = authenticate(backend='tapis', token=token, base_url=tenant_base_url)
 
         if user:
             login(request, user)
