@@ -1,0 +1,15 @@
+{% extends "images/image.html" %}
+{% block precontent %}
+<div>
+  <a href="{% url 'groups:groups' group=group %}">&lt;&lt;&nbsp;Back to {{group}}</a>
+</div>
+{% endblock %}
+{% block callbacks %}
+{{ block.super }}
+<script>
+  function saveRedirect(data, textStatus, jqXHR) {
+    // Upon successfully saving an image, redirect back to images list
+    window.location.assign(data.url);
+  }
+</script>
+{% endblock %}
