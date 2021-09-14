@@ -83,12 +83,6 @@ TAPIS_CLIENT_KEY = os.environ.get('TAPIS_CLIENT_KEY', None)
 if not TAPIS_CLIENT_ID or not TAPIS_CLIENT_KEY:
     logger.warning("Missing TAPIS_CLIENT_ID or TAPIS_CLIENT_KEY environment variable")
 
-# User login information
-TAPIS_USER = os.environ.get('TAPIS_USER', None)
-TAPIS_PASS = os.environ.get('TAPIS_PASS', None)
-if not TAPIS_USER or not TAPIS_PASS:
-    logger.warning("Missing TAPIS_USER or TAPIS_PASS environment variable")
-
 ALLOWED_HOSTS = ['*']
 # Setup support for proxy headers
 USE_X_FORWARDED_HOST = True
@@ -122,6 +116,7 @@ INSTALLED_APPS = [
     'jupyterhub_admin.apps.images',
     'jupyterhub_admin.apps.mounts',
     'jupyterhub_admin.apps.agaveauth',
+    'jupyterhub_admin.apps.links',
 ]
 
 MIDDLEWARE = [

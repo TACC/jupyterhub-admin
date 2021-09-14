@@ -23,5 +23,6 @@ urlpatterns = [
     path('images/', include('jupyterhub_admin.apps.images.urls')),
     path('mounts/', include('jupyterhub_admin.apps.mounts.urls')),
     path('auth/', include('jupyterhub_admin.apps.agaveauth.urls')),
+    path('links/', include('jupyterhub_admin.apps.links.urls')),
     path('', include('jupyterhub_admin.apps.main.urls'))
 ]
