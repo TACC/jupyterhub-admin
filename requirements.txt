@@ -5,3 +5,5 @@ pytest==6.2.3
 pytest-django==4.2.0
 agavepy==0.9.5
 pytest-mock==3.5.1
+pyjwt[crypto]==1.7.1
+tapipy

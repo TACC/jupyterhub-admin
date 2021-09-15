@@ -25,7 +25,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/3.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', None) 
+SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', None)
 if not SECRET_KEY:
     logger.warning("Missing DJANGO_SECRET_KEY environment variable. Generating random secret key.")
 SECRET_KEY = get_random_secret_key()
@@ -67,12 +67,23 @@ AGAVE_CLIENT_SECRET = os.environ.get('AGAVE_CLIENT_SECRET', None)
 if not AGAVE_CLIENT_KEY or not AGAVE_CLIENT_SECRET:
     logger.warning("Missing AGAVE_CLIENT_KEY or AGAVE_CLIENT_SECRET environment variable")
 
+# Agave API for Metadata
+TAPIS_API = os.environ.get('TAPIS_API', None)
+if not TAPIS_API:
+    logger.warning("Missing TAPIS_API environment variable")
+
+# Tapis login client key and secret
+TAPIS_CLIENT_ID = os.environ.get('TAPIS_CLIENT_ID', None)
+TAPIS_CLIENT_KEY = os.environ.get('TAPIS_CLIENT_KEY', None)
+if not TAPIS_CLIENT_ID or not TAPIS_CLIENT_KEY:
+    logger.warning("Missing TAPIS_CLIENT_ID or TAPIS_CLIENT_KEY environment variable")
+
 ALLOWED_HOSTS = ['*']
 # Setup support for proxy headers
 USE_X_FORWARDED_HOST = True
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
-LOGIN_URL = '/auth/agave'
+LOGIN_URL = '/auth/tapis'
 LOGIN_REDIRECT_URL = '/'
 
 STATIC_URL = '/static/'
@@ -99,7 +110,7 @@ INSTALLED_APPS = [
     'jupyterhub_admin.apps.main',
     'jupyterhub_admin.apps.images',
     'jupyterhub_admin.apps.mounts',
-    'jupyterhub_admin.apps.agaveauth',
+    'jupyterhub_admin.apps.tapisauth',
     'jupyterhub_admin.apps.groups',
 ]
 
@@ -164,7 +175,7 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 
-AUTHENTICATION_BACKENDS = ['jupyterhub_admin.apps.agaveauth.backends.AgaveOAuthBackend',
+AUTHENTICATION_BACKENDS = ['jupyterhub_admin.apps.tapisauth.backends.TapisOAuthBackend',
                            'django.contrib.auth.backends.ModelBackend']
 
 

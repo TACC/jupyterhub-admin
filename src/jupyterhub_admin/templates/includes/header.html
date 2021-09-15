@@ -23,25 +23,25 @@
           Hub
         </a>
         <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-          <a 
+          <a
             class="dropdown-item {% if request.resolver_match.app_name == 'groups' %}active{% endif %}"
             href="{% url 'groups:index' %}"
           >
             User Groups
           </a>
-          <a 
+          <a
             class="dropdown-item {% if request.resolver_match.app_name == 'mounts' %}active{% endif %}"
             href="{% url 'mounts:index' %}"
           >
             Volume Mounts
           </a>
-          <a 
-            class="dropdown-item {% if request.resolver_match.app_name == 'images' %}active{% endif %}" 
+          <a
+            class="dropdown-item {% if request.resolver_match.app_name == 'images' %}active{% endif %}"
             href="{% url 'images:index' %}"
           >
             Images
           </a>
-          <a 
+          <a
             class="dropdown-item {% if request.resolver_match.app_name == 'jupyterhub'%}active{% endif %}"
             href="{% url 'jupyterhub:index' %}"
           >
@@ -54,13 +54,13 @@
       {% if request.user.is_authenticated %}
         <li class="nav-item">
           <span class="navbar-text">
-            {{ request.user.username}} 
+            {{ request.user.username}}
             (<a href="{% url 'auth:logout' %}">Log Out</a>)
           </span>
         </li>
       {% else %}
         <li class="nav-item">
-          <a class="nav-link" href="{% url 'auth:agave_oauth' %}">Log In</a>
+          <a class="nav-link" href="{% url 'auth:tapis_oauth' %}">Log In</a>
         </li>
       {% endif %}
     </ul>

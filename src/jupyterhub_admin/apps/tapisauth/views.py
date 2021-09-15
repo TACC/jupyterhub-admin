@@ -5,6 +5,8 @@ import logging
 import time
 import requests
 import secrets
+import base64
+import json
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
@@ -12,6 +14,7 @@ from django.urls import reverse
 from django.core.exceptions import ObjectDoesNotExist
 from django.http import HttpResponseRedirect, HttpResponseBadRequest, HttpResponse
 from django.shortcuts import render
+from requests.auth import HTTPBasicAuth
 
 
 logger = logging.getLogger(__name__)
@@ -28,24 +31,23 @@ def _get_auth_state():
 
 
 def _get_redirect_uri(request):
-    logger.debug("AgaveOauth Request")
-    logger.debug(request.META)
     redirect_uri = 'https://{}{}'
     if request.get_host() == "localhost:8000":
         redirect_uri = 'http://{}{}'
     redirect_uri = redirect_uri.format(
         request.get_host(),
-        reverse('auth:agave_oauth_callback')
+        reverse('auth:tapis_oauth_callback')
     )
     return redirect_uri
 
 
 # Create your views here.
-def agave_oauth(request):
-    """First step for agave OAuth workflow.
+def tapis_oauth(request):
+    """First step for Tapis OAuth workflow.
     """
-    tenant_base_url = getattr(settings, 'AGAVE_API')
-    client_key = getattr(settings, 'AGAVE_CLIENT_KEY')
+    tenant_base_url = getattr(settings, 'TAPIS_API')
+    client_id = getattr(settings, 'TAPIS_CLIENT_ID')
+    client_key = getattr(settings, 'TAPIS_CLIENT_KEY')
 
     session = request.session
     session['auth_state'] = _get_auth_state()
@@ -53,11 +55,11 @@ def agave_oauth(request):
     if next_page:
         session['next'] = next_page
     redirect_uri = _get_redirect_uri(request)
-    METRICS.debug("user:{} starting oauth redirect login".format(request.user.username))
+
     authorization_url = (
-        '%s/authorize?client_id=%s&response_type=code&redirect_uri=%s&state=%s' % (
+        '%s/oauth2/authorize?client_id=%s&redirect_uri=%s&response_type=code&state=%s' % (
             tenant_base_url,
-            client_key,
+            client_id,
             redirect_uri,
             session['auth_state'],
         )
@@ -65,10 +67,9 @@ def agave_oauth(request):
     return HttpResponseRedirect(authorization_url)
 
 
-def agave_oauth_callback(request):
-    """Agave OAuth callback handler.
+def tapis_oauth_callback(request):
+    """Tapis OAuth callback handler.
     """
-
     state = request.GET.get('state')
 
     if request.session['auth_state'] != state:
@@ -79,26 +80,37 @@ def agave_oauth_callback(request):
 
     if 'code' in request.GET:
         redirect_uri = _get_redirect_uri(request)
-        logger.debug('redirect_uri %s', redirect_uri)
+        METRICS.debug('redirect_uri %s', redirect_uri)
+
         code = request.GET['code']
-        tenant_base_url = getattr(settings, 'AGAVE_API')
-        client_key = getattr(settings, 'AGAVE_CLIENT_KEY')
-        client_sec = getattr(settings, 'AGAVE_CLIENT_SECRET')
+
+        tenant_base_url = getattr(settings, 'TAPIS_API')
+        client_id = getattr(settings, 'TAPIS_CLIENT_ID')
+        client_key = getattr(settings, 'TAPIS_CLIENT_KEY')
+
         body = {
-            'grant_type': 'authorization_code',
-            'code': code,
-            'redirect_uri': redirect_uri,
+            "grant_type":"authorization_code",
+            "code":code,
+            "redirect_uri":redirect_uri
         }
-        # TODO update to token call in agavepy
-        logger.debug("Redeem authorization code for token")
-        response = requests.post('%s/token' % tenant_base_url,
-                                 data=body,
-                                 auth=(client_key, client_sec))
-        token_data = response.json()
-        logger.debug(token_data)
-        token_data['created'] = int(time.time())
+
+        url = '%s/oauth2/tokens' % tenant_base_url
+
+        data = None
+        try:
+            response = requests.post(
+                url,
+                json=body,
+                auth=HTTPBasicAuth(client_id, client_key)
+            )
+            data = response.json()
+        except Exception as e:
+            logger.debug(e)
+
+        token = data['result']['access_token']['access_token']
+
         # log user in
-        user = authenticate(backend='agave', token=token_data['access_token'])
+        user = authenticate(backend='tapis', token=token, base_url=tenant_base_url)
 
         if user:
             login(request, user)
@@ -125,7 +137,7 @@ def agave_oauth_callback(request):
         return HttpResponseRedirect(reverse('main:index'))
 
 
-def agave_session_error(request):
-    """Agave token error handler.
+def tapis_session_error(request):
+    """Tapis token error handler.
     """
     pass

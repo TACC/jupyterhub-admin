@@ -1,16 +1,16 @@
 import pytest
-from jupyterhub_admin.apps.agaveauth.utils import add_admin_user, remove_admin_user
+from jupyterhub_admin.apps.tapisauth.utils import add_admin_user, remove_admin_user
 
 
 
 @pytest.fixture
 def write_meta(mocker):
-    yield mocker.patch('jupyterhub_admin.apps.agaveauth.utils.write_config_metadata')
+    yield mocker.patch('jupyterhub_admin.apps.tapisauth.utils.write_config_metadata')
 
 
 @pytest.fixture
 def get_meta(mocker):
-    yield mocker.patch('jupyterhub_admin.apps.agaveauth.utils.get_config_metadata')
+    yield mocker.patch('jupyterhub_admin.apps.tapisauth.utils.get_config_metadata')
 
 
 def test_no_admin_users(get_meta, write_meta):

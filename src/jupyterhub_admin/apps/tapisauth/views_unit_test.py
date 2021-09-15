@@ -22,7 +22,7 @@ def regular_user(django_user_model, django_db_reset_sequences):
 
 def test_auth_agave(client, mocker):
     mocker.patch(
-        'jupyterhub_admin.apps.agaveauth.views._get_auth_state',
+        'jupyterhub_admin.apps.tapisauth.views._get_auth_state',
         return_value=TEST_STATE
     )
 
@@ -39,8 +39,8 @@ def test_auth_agave(client, mocker):
 
 
 def test_agave_callback(client, mocker, regular_user):
-    mock_authenticate = mocker.patch('jupyterhub_admin.apps.agaveauth.views.authenticate')
-    mock_agave_token_post = mocker.patch('jupyterhub_admin.apps.agaveauth.views.requests.post')
+    mock_authenticate = mocker.patch('jupyterhub_admin.apps.tapisauth.views.authenticate')
+    mock_agave_token_post = mocker.patch('jupyterhub_admin.apps.tapisauth.views.requests.post')
 
     # add auth to session
     session = client.session

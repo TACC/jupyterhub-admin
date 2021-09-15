@@ -2,7 +2,7 @@
 
 from django.core.management.base import BaseCommand
 import logging
-from jupyterhub_admin.apps.agaveauth.utils import add_admin_user
+from jupyterhub_admin.apps.tapisauth.utils import add_admin_user
 
 
 logger = logging.getLogger(__name__)
