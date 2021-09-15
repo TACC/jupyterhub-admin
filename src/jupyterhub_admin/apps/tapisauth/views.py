@@ -48,7 +48,6 @@ def tapis_oauth(request):
     tenant_base_url = getattr(settings, 'TAPIS_API')
     client_id = getattr(settings, 'TAPIS_CLIENT_ID')
     client_key = getattr(settings, 'TAPIS_CLIENT_KEY')
-    token = getattr(settings, 'TAPIS_SERVICE_TOKEN')
 
     session = request.session
     session['auth_state'] = _get_auth_state()
