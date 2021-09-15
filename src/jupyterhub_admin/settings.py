@@ -72,11 +72,6 @@ TAPIS_API = os.environ.get('TAPIS_API', None)
 if not TAPIS_API:
     logger.warning("Missing TAPIS_API environment variable")
 
-# Tapis token for Jupyterh account
-TAPIS_SERVICE_TOKEN = os.environ.get('TAPIS_SERVICE_TOKEN', None)
-if not TAPIS_SERVICE_TOKEN:
-    logger.warning("Missing TAPIS_SERVICE_TOKEN environment variable")
-
 # Tapis login client key and secret
 TAPIS_CLIENT_ID = os.environ.get('TAPIS_CLIENT_ID', None)
 TAPIS_CLIENT_KEY = os.environ.get('TAPIS_CLIENT_KEY', None)
