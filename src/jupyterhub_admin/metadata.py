@@ -80,6 +80,14 @@ def delete_group_config_metadata(group):
     meta = get_group_config_metadata(group)
     ag.meta.deleteMetadata(uuid=meta['uuid'])
 
+def get_admin_tenant_metadata():
+    ag = Agave(api_server=settings.AGAVE_API, token=settings.AGAVE_SERVICE_TOKEN)
+    metadata = ag.meta.listMetadata()
+    matching = []
+    for entry in metadata:
+        if 'admin_users' in entry['value'] and settings.TENANT in entry['value']['admin_users']:
+            matching.append(entry)
+    return matching
 
 def write_config_metadata(value):
     ag = get_agave_client()
