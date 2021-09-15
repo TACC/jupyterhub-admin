@@ -89,19 +89,10 @@ def tapis_oauth_callback(request):
         client_id = getattr(settings, 'TAPIS_CLIENT_ID')
         client_key = getattr(settings, 'TAPIS_CLIENT_KEY')
 
-        credentials = client_id + ":" + client_key
-        cred_bytes = credentials.encode('ascii')
-        cred_encoded = base64.b64encode(cred_bytes)
-        cred_encoded_string = cred_encoded.decode('ascii')
-
         body = {
             "grant_type":"authorization_code",
             "code":code,
             "redirect_uri":redirect_uri
-        }
-
-        headers = {
-            "Authorization":"Basic %s" % cred_encoded_string
         }
 
         url = '%s/oauth2/tokens' % tenant_base_url
@@ -111,7 +102,7 @@ def tapis_oauth_callback(request):
             response = requests.post(
                 url,
                 json=body,
-                headers=headers
+                auth=HTTPBasicAuth(client_id, client_key)
             )
             data = response.json()
         except Exception as e:
@@ -139,8 +130,8 @@ def tapis_oauth_callback(request):
 
         return HttpResponseRedirect(reverse('auth:logout'))
 
-    if 'v3_next' in request.session:
-        next_uri = request.session.pop('v3_next')
+    if 'next' in request.session:
+        next_uri = request.session.pop('next')
         return HttpResponseRedirect(next_uri)
     else:
         login_url = getattr(settings, 'LOGIN_REDIRECT_URL')

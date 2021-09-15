@@ -34,7 +34,6 @@ class TapisOAuthBackend(ModelBackend):
                     user_info_url,
                     headers=headers
                 )
-                logger.debug(response.json())
                 user_info = response.json()
             except Exception as e:
                 logger.exception(e)

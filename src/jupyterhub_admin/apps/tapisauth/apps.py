@@ -1,6 +1,6 @@
 from django.apps import AppConfig
 
 
-class AgaveAuthConfig(AppConfig):
+class TapisAuthConfig(AppConfig):
     default_auto_field = 'django.db.models.BigAutoField'
-    name = 'jupyterhub_admin.apps.agaveauth'
+    name = 'jupyterhub_admin.apps.tapisauth'

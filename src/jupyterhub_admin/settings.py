@@ -115,7 +115,7 @@ INSTALLED_APPS = [
     'jupyterhub_admin.apps.main',
     'jupyterhub_admin.apps.images',
     'jupyterhub_admin.apps.mounts',
-    'jupyterhub_admin.apps.agaveauth',
+    'jupyterhub_admin.apps.tapisauth',
     'jupyterhub_admin.apps.groups',
 ]
 
@@ -180,7 +180,7 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 
-AUTHENTICATION_BACKENDS = ['jupyterhub_admin.apps.agaveauth.backends.TapisOAuthBackend',
+AUTHENTICATION_BACKENDS = ['jupyterhub_admin.apps.tapisauth.backends.TapisOAuthBackend',
                            'django.contrib.auth.backends.ModelBackend']
 
 
