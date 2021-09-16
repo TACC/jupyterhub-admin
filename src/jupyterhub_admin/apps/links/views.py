@@ -20,10 +20,9 @@ def index(request):
         metadata = get_admin_tenant_metadata()
         links = []
         for entry in metadata:
-            if 'admin_users' in entry['value'] and settings.TENANT in entry['value']['admin_users']:
-                context['links'].append({
-                    'link': entry['value']['oauth_callback_url'].removesuffix('/hub/oauth_callback')
-                })
+            context['links'].append({
+                'link': entry['value']['oauth_callback_url'].removesuffix('/hub/oauth_callback')
+            })
     except Exception as e:
         context['error'] = True
         context['message'] = 'Admin links could not be retrieved'
