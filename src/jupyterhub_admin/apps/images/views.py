@@ -1,7 +1,10 @@
 from django.http import HttpResponse
 from django.template import loader
 from django.urls import reverse
-from jupyterhub_admin.metadata import get_config_metadata, write_config_metadata
+from jupyterhub_admin.metadata import (
+    get_tapis_config_metadata,
+    write_tapis_config_metadata
+)
 from django.contrib.auth.decorators import login_required
 import logging
 import copy
@@ -37,7 +40,8 @@ def index(request):
         'images': []
     }
     try:
-        metadata = get_config_metadata()
+        metadata = get_tapis_config_metadata()
+        print(metadata)
         context['images'] = metadata['value']['images']
     except Exception as e:
         context['error'] = True
@@ -57,10 +61,10 @@ def images(request, index):
         'api': reverse('images:api', args=[str(index)])
     }
     try:
-        metadata = get_config_metadata()
+        metadata = get_tapis_config_metadata()
         image = metadata['value']['images'][index]
         context['fields'] = get_fields(image)
-        context['message'] = f"Configuration for {image['display_name']}" 
+        context['message'] = f"Configuration for {image['display_name']}"
         context['delete_confirmation'] = f"{image['display_name']} ({image['name']})"
     except Exception as e:
         context['error'] = True
@@ -89,7 +93,7 @@ def api(request, index):
         display_name = request.POST.get('display_name')
         image_name = request.POST.get('image_name')
         try:
-            metadata = get_config_metadata()
+            metadata = get_tapis_config_metadata()
             image = {
                 'display_name': display_name,
                 'name': image_name
@@ -99,20 +103,19 @@ def api(request, index):
             else:
                 index = int(index)
                 metadata['value']['images'][index] = image
-            write_config_metadata(metadata['value'])
+            write_tapis_config_metadata(metadata['value'])
             return HttpResponse("OK")
         except Exception as e:
             logger.exception(e)
             return HttpResponse(status=500)
-    
+
     if request.method == 'DELETE':
         try:
             index = int(index)
-            metadata = get_config_metadata()
+            metadata = get_tapis_config_metadata()
             metadata['value']['images'].pop(index)
-            write_config_metadata(metadata['value'])
+            write_tapis_config_metadata(metadata['value'])
             return HttpResponse("OK")
         except Exception as e:
             logger.exception(e)
             return HttpResponse(status=500)
-            

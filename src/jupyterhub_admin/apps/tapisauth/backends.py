@@ -4,7 +4,7 @@ import requests
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.contrib.auth.backends import ModelBackend
-from jupyterhub_admin.metadata import get_config_metadata
+from jupyterhub_admin.metadata import get_tapis_config_metadata
 import jwt
 from tapipy.tapis import Tapis
 
@@ -40,7 +40,7 @@ class TapisOAuthBackend(ModelBackend):
                 raise Exception('Tapis Authentication failed')
 
             username = user_info['result']['username']
-            meta = get_config_metadata()
+            meta = get_tapis_config_metadata()
             if 'admin_users' not in meta['value'] or username not in meta['value']['admin_users']:
                 raise Exception('%s is not a hub admin user' % username)
             UserModel = get_user_model()
