@@ -27,23 +27,7 @@ def index(request):
     }
     try:
         metadata = list_tapis_group_config_metadata()
-        print("metadata")
-        print(metadata)
-        #get_admin_group_metadata()
-        print("USER GROUPS TEST")
 
-        '''
-        for group in metadata:
-            if group['value']['group_name'] in user_groups:
-                context['groups'].push(
-                    {
-                        'group': group['value']['group_name'],
-                        'users': len(group['value']['user']),
-                        'images': len(group['value']['images']),
-                        'volume_mounts': len(group['value']['volume_mounts']),
-                    }
-                )
-        '''
         context['groups'] = [
             {
                 'group': group['value']['group_name'],
@@ -63,19 +47,14 @@ def index(request):
 
 @login_required
 def groups(request, group):
-    print("GROUP: %s" % group)
     template = loader.get_template("groups/group.html")
     context = {
         'error': False,
     }
     try:
-        print("TRY")
         metadata = list_tapis_group_config_metadata()
-        print("metadata")
-        print(metadata)
+
         context['group'] = get_tapis_group_config_metadata(group)['value']
-        print("context group")
-        print(context['group'])
         context['existing'] = [ group['value']['group_name'] for group in metadata ]
         context['groupNameApi'] = reverse('groups:rename_group')
     except Exception as e:

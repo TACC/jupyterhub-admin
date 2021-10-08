@@ -41,7 +41,6 @@ def index(request):
     }
     try:
         metadata = get_tapis_config_metadata()
-        print(metadata)
         context['images'] = metadata['value']['images']
     except Exception as e:
         context['error'] = True
