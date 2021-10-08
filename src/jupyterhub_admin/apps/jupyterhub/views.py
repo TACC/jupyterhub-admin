@@ -5,9 +5,13 @@ from jupyterhub_admin.jhub_api import (
     get_user,
     stop_server,
     parse_user,
-    has_server
+    has_server,
+    start_server,
+    get_user_token
 )
 from django.contrib.auth.decorators import login_required
+from django.conf import settings
+from django.shortcuts import redirect
 import dateutil.parser
 import logging
 
@@ -59,7 +63,7 @@ def index(request):
         context['users'] = [ format_user(user) for user in users ]
     except Exception as e:
         context['error'] = True
-        logger.exception()
+        logger.exception(e)
     return HttpResponse(template.render(context, request))
 
 
@@ -75,7 +79,7 @@ def user(request, username):
     except Exception as e:
         context['error'] = True
         context['message'] = f'Unable to retrieve JupyterHub user information for {username}'
-        logger.exception()
+        logger.exception(e)
     return HttpResponse(template.render(context, request))
 
 
@@ -85,9 +89,34 @@ def server(request, username):
         try:
             logger.info(f"Stop server requested for {username}")
             result = stop_server(username)
+            if not (result.status_code >= 200 and result.status_code < 300):
+                logger.info(result)
+                raise Exception(result.text)
             logger.info(f"Stop server successful for {username}")
             return HttpResponse("OK")
         except Exception as e:
             logger.error(f"Stop server failed for {username}")
-            logger.exception()
+            logger.exception(e)
             return HttpResponse(status=500)
+    elif request.method == 'POST':
+        try:
+            logger.info(f"Start server requested for {username}")
+            result = start_server(username)
+            if not (result.status_code >= 200 and result.status_code < 300):
+                logger.info(result)
+                raise Exception(result.text)
+            logger.info(f"Start server successful for {username}")
+            return HttpResponse("OK")
+        except Exception as e:
+            logger.error(f"Start server failed for {username}")
+            logger.exception(e)
+            return HttpResponse(status=500)
+
+@login_required
+def view_server(request, username):
+    try:
+        response = get_user_token(username)
+        token = response['token']
+        return redirect(f"{settings.JUPYTERHUB_SERVER}/user/{username}/?token={token}")
+    except Exception as e:
+        return HttpResponse(status=500)

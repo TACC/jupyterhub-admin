@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %} Workbench {% endblock %}
+{% block head_extra %}
+  <base href="{% url 'main:index' %}">
+{% endblock %}
+{% block styles %}
+  <link rel="stylesheet" href="">
+  <link rel="stylesheet" href="">
+{% endblock %}
+{% block content %}
+  <h3>
+    JupyterHub Links
+  </h3>
+  <p>
+    Here you can view the JupyterHub links that you are an admin user of
+  </p>
+  {% if error == True %}
+    <h4>
+      {{ message }}
+    </h4>
+  {% else %}
+    <table border=1 class="table">
+      <tbody>
+        {% for link in links %}
+          <tr>
+            <td>
+              {{ link.link }}
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  {% endif %}
+{% endblock %}
+{% block scripts %}
+{% endblock %}

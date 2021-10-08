@@ -1,0 +1,13 @@
+{
+    "name": "{name}",
+    "value": {
+        "tenant": "{tenant}",
+        "instance": "{instance}",
+        "user": [],
+        "images": [],
+        "config_type": "group",
+        "volume_mounts": [],
+        "group_name": "{group}",
+        "name": "{group}.group.config.{tenant}.{instance}.jhub"
+    }
+}

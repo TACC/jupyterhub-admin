@@ -22,6 +22,8 @@ urlpatterns = [
     path('jhub/', include('jupyterhub_admin.apps.jupyterhub.urls')),
     path('images/', include('jupyterhub_admin.apps.images.urls')),
     path('mounts/', include('jupyterhub_admin.apps.mounts.urls')),
-    path('auth/', include('jupyterhub_admin.apps.agaveauth.urls')),
+    path('groups/', include('jupyterhub_admin.apps.groups.urls')),
+    path('auth/', include('jupyterhub_admin.apps.tapisauth.urls')),
+    path('links/', include('jupyterhub_admin.apps.links.urls')),
     path('', include('jupyterhub_admin.apps.main.urls'))
 ]

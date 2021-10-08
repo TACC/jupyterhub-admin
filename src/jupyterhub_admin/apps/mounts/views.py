@@ -1,7 +1,7 @@
 from django.http import HttpResponse
 from django.template import loader
 from django.urls import reverse
-from jupyterhub_admin.metadata import get_config_metadata, write_config_metadata
+from jupyterhub_admin.metadata import get_tapis_config_metadata, write_tapis_config_metadata
 from django.contrib.auth.decorators import login_required
 import logging
 import copy
@@ -59,7 +59,7 @@ def index(request):
         'mounts': []
     }
     try:
-        metadata = get_config_metadata()
+        metadata = get_tapis_config_metadata()
         mounts = metadata['value']['volume_mounts']
         for mount in mounts:
             if mount['type'] != 'hostPath':
@@ -88,10 +88,10 @@ def mounts(request, index):
         'api': reverse('mounts:api', args=[str(index)])
     }
     try:
-        metadata = get_config_metadata()
+        metadata = get_tapis_config_metadata()
         mount = metadata['value']['volume_mounts'][index]
         context['fields'] = get_fields(mount)
-        context['message'] = f"Configuration for {mount['mountPath']}" 
+        context['message'] = f"Configuration for {mount['mountPath']}"
         context['delete_confirmation'] = f"{mount['mountPath']}"
     except Exception as e:
         context['error'] = True
@@ -118,8 +118,7 @@ def new_mount(request):
 def api(request, index):
     if request.method == 'POST':
         try:
-            metadata = get_config_metadata()
-            print(request.POST.get('read_only'))
+            metadata = get_tapis_config_metadata()
             mount = {
                 'type': request.POST.get('mount_type'),
                 'path': request.POST.get('path'),
@@ -133,20 +132,19 @@ def api(request, index):
             else:
                 index = int(index)
                 metadata['value']['volume_mounts'][index] = mount
-            write_config_metadata(metadata['value'])
+            write_tapis_config_metadata(metadata['value'])
             return HttpResponse("OK")
         except Exception as e:
             logger.exception(e)
             return HttpResponse(status=500)
-    
+
     if request.method == 'DELETE':
         try:
             index = int(index)
-            metadata = get_config_metadata()
+            metadata = get_tapis_config_metadata()
             metadata['value']['volume_mounts'].pop(index)
-            write_config_metadata(metadata['value'])
+            write_tapis_config_metadata(metadata['value'])
             return HttpResponse("OK")
         except Exception as e:
             logger.exception(e)
             return HttpResponse(status=500)
-            

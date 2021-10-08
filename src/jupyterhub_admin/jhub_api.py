@@ -27,9 +27,15 @@ def get_user(username):
     return jupyterhub_request('GET', f'/users/{username}').json()
 
 
+def get_user_token(username):
+    return jupyterhub_request('POST', f'/users/{username}/tokens').json()
+
+
 def stop_server(username):
     return jupyterhub_request('DELETE', f'/users/{username}/server')
 
+def start_server(username):
+    return jupyterhub_request('POST', f'/users/{username}/server')
 
 def parse_user(user):
     """
