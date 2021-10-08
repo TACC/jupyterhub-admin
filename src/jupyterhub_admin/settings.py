@@ -67,10 +67,15 @@ AGAVE_CLIENT_SECRET = os.environ.get('AGAVE_CLIENT_SECRET', None)
 if not AGAVE_CLIENT_KEY or not AGAVE_CLIENT_SECRET:
     logger.warning("Missing AGAVE_CLIENT_KEY or AGAVE_CLIENT_SECRET environment variable")
 
-# Agave API for Metadata
+# TAPIS API for Metadata
+TAPIS_API_URL = os.environ.get('TAPIS_API_URL', None)
 TAPIS_API = os.environ.get('TAPIS_API', None)
-if not TAPIS_API:
-    logger.warning("Missing TAPIS_API environment variable")
+if not TAPIS_API or not TAPIS_API_URL:
+    logger.warning("Missing TAPIS_API or TAPIS_API_URL environment variable")
+
+TAPIS_SERVICE_TOKEN = os.environ.get('TAPIS_SERVICE_TOKEN', None)
+if not TAPIS_SERVICE_TOKEN:
+    logger.warning("Missing TAPIS_SERVICE_TOKEN environment variable")
 
 # Tapis login client key and secret
 TAPIS_CLIENT_ID = os.environ.get('TAPIS_CLIENT_ID', None)

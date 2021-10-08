@@ -2,12 +2,12 @@ from django.http import HttpResponse, JsonResponse
 from django.template import loader
 from django.urls import reverse
 from jupyterhub_admin.metadata import (
-    list_group_config_metadata,
-    write_group_config_metadata,
-    create_group_config_metadata,
-    get_group_config_metadata,
-    rename_group_config_metadata,
-    delete_group_config_metadata
+    list_tapis_group_config_metadata,
+    write_tapis_group_config_metadata,
+    create_tapis_group_config_metadata,
+    get_tapis_group_config_metadata,
+    rename_tapis_group_config_metadata,
+    delete_tapis_group_config_metadata
 )
 from django.contrib.auth.decorators import login_required
 import logging
@@ -26,7 +26,8 @@ def index(request):
         'groups': []
     }
     try:
-        metadata = list_group_config_metadata()
+        metadata = list_tapis_group_config_metadata()
+
         context['groups'] = [
             {
                 'group': group['value']['group_name'],
@@ -51,8 +52,9 @@ def groups(request, group):
         'error': False,
     }
     try:
-        metadata = list_group_config_metadata()
-        context['group'] = get_group_config_metadata(group)['value']
+        metadata = list_tapis_group_config_metadata()
+
+        context['group'] = get_tapis_group_config_metadata(group)['value']
         context['existing'] = [ group['value']['group_name'] for group in metadata ]
         context['groupNameApi'] = reverse('groups:rename_group')
     except Exception as e:
@@ -65,7 +67,7 @@ def groups(request, group):
 def create_group(request):
     content = json.loads(request.body)
     group = content['group']
-    create_group_config_metadata(group)
+    create_tapis_group_config_metadata(group)
     url = reverse('groups:groups', args=[group])
     return JsonResponse({ 'url': url })
 
@@ -75,7 +77,7 @@ def rename_group(request):
     content = json.loads(request.body)
     original = content['previousName']
     group = content['group']
-    rename_group_config_metadata(original, group)
+    rename_tapis_group_config_metadata(original, group)
     url = reverse('groups:groups', args=[group])
     return JsonResponse({ 'url': url })
 
@@ -84,7 +86,7 @@ def rename_group(request):
 def delete_group(request):
     content = json.loads(request.body)
     group = content['group']
-    delete_group_config_metadata(group)
+    delete_tapis_group_config_metadata(group)
     return JsonResponse({ 'url': reverse('groups:index')})
 
 
@@ -121,7 +123,7 @@ def user(request, group, index):
         'api': reverse('groups:user_api', args=[group, str(index)])
     }
     try:
-        meta = get_group_config_metadata(group)
+        meta = get_tapis_group_config_metadata(group)
         if index == 'new':
             context['message'] = "Add a new group member"
             context['delete_confirmation'] = ""
@@ -166,7 +168,7 @@ def images(request, group, index):
         'api': reverse('groups:images_api', args=[group, str(index)])
     }
     try:
-        meta = get_group_config_metadata(group)
+        meta = get_tapis_group_config_metadata(group)
         if index == 'new':
             context['message'] = "Add a new image for this group"
             context['delete_confirmation'] = ""
@@ -202,10 +204,10 @@ def mounts(request, group, index):
             context['delete_confirmation'] = ""
         else:
             index = int(index)
-            metadata = get_group_config_metadata(group)
+            metadata = get_tapis_group_config_metadata(group)
             mount = metadata['value']['volume_mounts'][index]
             context['fields'] = get_mount_fields(mount)
-            context['message'] = f"Configuration for group mount {mount['mountPath']}" 
+            context['message'] = f"Configuration for group mount {mount['mountPath']}"
             context['delete_confirmation'] = f"{mount['mountPath']} from group {group}"
     except Exception as e:
         context['error'] = True
@@ -219,24 +221,24 @@ def user_api(request, group, index):
     if request.method == 'POST':
         user = request.POST.get('user')
         try:
-            metadata = get_group_config_metadata(group)
+            metadata = get_tapis_group_config_metadata(group)
             if index == 'new':
                 metadata['value']['user'].append(user)
             else:
                 index = int(index)
                 metadata['value']['user'][index] = user
-            write_group_config_metadata(group, metadata['value'])
+            write_tapis_group_config_metadata(group, metadata['value'])
             return JsonResponse(data = {'url': reverse('groups:groups', args=[group])})
         except Exception as e:
             logger.exception(e)
             return HttpResponse(status=500)
-    
+
     if request.method == 'DELETE':
         try:
             index = int(index)
-            metadata = get_group_config_metadata(group)
+            metadata = get_tapis_group_config_metadata(group)
             metadata['value']['user'].pop(index)
-            write_group_config_metadata(group, metadata['value'])
+            write_tapis_group_config_metadata(group, metadata['value'])
             return JsonResponse(data = {'url': reverse('groups:groups', args=[group])})
         except Exception as e:
             logger.exception(e)
@@ -249,7 +251,7 @@ def images_api(request, group, index):
         display_name = request.POST.get('display_name')
         image_name = request.POST.get('image_name')
         try:
-            metadata = get_group_config_metadata(group)
+            metadata = get_tapis_group_config_metadata(group)
             image = {
                 'display_name': display_name,
                 'name': image_name
@@ -259,18 +261,18 @@ def images_api(request, group, index):
             else:
                 index = int(index)
                 metadata['value']['images'][index] = image
-            write_group_config_metadata(group, metadata['value'])
+            write_tapis_group_config_metadata(group, metadata['value'])
             return JsonResponse(data = {'url': reverse('groups:groups', args=[group])})
         except Exception as e:
             logger.exception(e)
             return HttpResponse(status=500)
-    
+
     if request.method == 'DELETE':
         try:
             index = int(index)
-            metadata = get_group_config_metadata(group)
+            metadata = get_tapis_group_config_metadata(group)
             metadata['value']['images'].pop(index)
-            write_group_config_metadata(group, metadata['value'])
+            write_tapis_group_config_metadata(group, metadata['value'])
             return JsonResponse(data = {'url': reverse('groups:groups', args=[group])})
         except Exception as e:
             logger.exception(e)
@@ -281,7 +283,7 @@ def images_api(request, group, index):
 def mounts_api(request, group, index):
     if request.method == 'POST':
         try:
-            metadata = get_group_config_metadata(group)
+            metadata = get_tapis_group_config_metadata(group)
             mount = {
                 'type': request.POST.get('mount_type'),
                 'path': request.POST.get('path'),
@@ -295,20 +297,19 @@ def mounts_api(request, group, index):
             else:
                 index = int(index)
                 metadata['value']['volume_mounts'][index] = mount
-            write_group_config_metadata(group, metadata['value'])
+            write_tapis_group_config_metadata(group, metadata['value'])
             return JsonResponse(data = {'url': reverse('groups:groups', args=[group])})
         except Exception as e:
             logger.exception(e)
             return HttpResponse(status=500)
-    
+
     if request.method == 'DELETE':
         try:
             index = int(index)
-            metadata = get_group_config_metadata(group)
+            metadata = get_tapis_group_config_metadata(group)
             metadata['value']['volume_mounts'].pop(index)
-            write_group_config_metadata(group, metadata['value'])
+            write_tapis_group_config_metadata(group, metadata['value'])
             return JsonResponse(data = {'url': reverse('groups:groups', args=[group])})
         except Exception as e:
             logger.exception(e)
             return HttpResponse(status=500)
-            
