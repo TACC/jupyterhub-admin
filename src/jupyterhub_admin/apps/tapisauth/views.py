@@ -45,7 +45,7 @@ def _get_redirect_uri(request):
 def tapis_oauth(request):
     """First step for Tapis OAuth workflow.
     """
-    tenant_base_url = getattr(settings, 'TAPIS_API')
+    tenant_base_url = getattr(settings, 'TAPIS_API_URL')
     client_id = getattr(settings, 'TAPIS_CLIENT_ID')
     client_key = getattr(settings, 'TAPIS_CLIENT_KEY')
 
@@ -84,7 +84,7 @@ def tapis_oauth_callback(request):
 
         code = request.GET['code']
 
-        tenant_base_url = getattr(settings, 'TAPIS_API')
+        tenant_base_url = getattr(settings, 'TAPIS_API_URL')
         client_id = getattr(settings, 'TAPIS_CLIENT_ID')
         client_key = getattr(settings, 'TAPIS_CLIENT_KEY')
 
