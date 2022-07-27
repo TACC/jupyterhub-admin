@@ -27,6 +27,14 @@
     >
       Delete
     </button>
+    <button
+      type="submit"
+      class="btn btn-danger"
+      data-toggle="modal" 
+      data-target="#stopServersModal"
+    >
+      Stop Group Servers
+    </button>
   </div>
   <br />
   <div>
@@ -162,6 +170,31 @@
     </div>
   </div>
 </div>
+<div class="modal" role="dialog" id="stopServersModal">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Confirm Stop All Servers</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <p>Are you sure you wish to stop all servers for users in group <b>{{ group.group_name }}</b>?</p>
+      </div>
+      <div class="modal-footer">
+        <div class="spinner-border" role="status" id="stopGroupServersLoadingSpinner">
+          <span class="sr-only">Stopping all servers...</span>
+        </div>
+        <div id="stopGroupServersError">
+          Error trying to stop user servers
+        </div>
+        <button type="button" class="btn btn-danger" id="confirmStopGroupServers" data-dismiss="modal">Stop All Servers</button>
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+      </div>
+    </div>
+  </div>
+</div>
 <script>
   function deleteSuccess(data, textStatus, jqXHR) {
     $("#deleteGroupError").hide();
@@ -190,9 +223,39 @@
       }
     )
   }
+  function stopSuccess(data, textStatus, jqXHR) {
+    $("#stopGroupServersError").hide();
+    $("#stopGroupServersLoadingSpinner").show();
+    window.location.assign("{% url 'groups:index' %}");
+  }
+
+  function stopFailure(jqXHR, textStatus, errorThrown) {
+    // Upon failing to save or delete an item, show the error
+    $("#stopGroupServersError").show();
+    $("#stopGroupServersLoadingSpinner").hide();
+  }
+
+  function stopGroupServers() {
+    $("#stopGroupServersLoadingSpinner").show();
+    $("#stopGroupServersError").hide();
+    $("#confirmStopGroupServers").attr('disabled', true);
+    $.ajax(
+      "{% url 'groups:stop_all_servers' %}",
+      {
+        method: 'POST',
+        headers: {'X-CSRFToken': '{{ csrf_token }}', 'Content-Type':'application/json'},
+        data: JSON.stringify({ 'group': '{{ group.group_name }}' }), 
+        success: stopSuccess,
+        error: stopFailure
+      }
+    )
+  }
 
   $("#deleteGroupLoadingSpinner").hide();
   $("#deleteGroupError").hide();
   $("#confirmDelete").click(deleteGroup);
+  $("#stopGroupServersLoadingSpinner").hide();
+  $("#stopGroupServersError").hide();
+  $("#confirmStopGroupServers").click(stopGroupServers);
 </script>
 {% endblock %}

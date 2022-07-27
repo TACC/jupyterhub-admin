@@ -1,5 +1,6 @@
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 from django.template import loader
+from django.urls import reverse
 from jupyterhub_admin.jhub_api import (
     get_users,
     get_user,
@@ -7,7 +8,8 @@ from jupyterhub_admin.jhub_api import (
     parse_user,
     has_server,
     start_server,
-    get_user_token
+    get_user_token,
+    stop_specified_server
 )
 from django.contrib.auth.decorators import login_required
 from django.conf import settings
@@ -73,9 +75,18 @@ def user(request, username):
     context = {
         'error': False,
         'message': f'JupyterHub User {username}',
+        'servers': [],
+        'username': username
     }
     try:
         context['user'] = format_user(parse_user(get_user(username)))
+        context['serverNameApi'] = reverse('jupyterhub:stop_server')
+        logger.debug(context['user'])
+        if len(context['user']['servers']) > 1:
+            servers = context['user']['servers']
+            servers.pop('')
+            for server in servers:
+                context['servers'].append(server)
     except Exception as e:
         context['error'] = True
         context['message'] = f'Unable to retrieve JupyterHub user information for {username}'
@@ -120,3 +131,9 @@ def view_server(request, username):
         return redirect(f"{settings.JUPYTERHUB_SERVER}/user/{username}/?token={token}")
     except Exception as e:
         return HttpResponse(status=500)
+
+@login_required
+def stop_server(request, username, server):
+    stop_specified_server(username, server)
+    url = reverse('jupyterhub:user', args=[username])
+    return JsonResponse({ 'url': url })

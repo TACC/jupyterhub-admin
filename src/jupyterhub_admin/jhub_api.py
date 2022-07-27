@@ -34,8 +34,14 @@ def get_user_token(username):
 def stop_server(username):
     return jupyterhub_request('DELETE', f'/users/{username}/server')
 
+
 def start_server(username):
     return jupyterhub_request('POST', f'/users/{username}/server')
+
+
+def stop_specified_server(username, server):
+    return jupyterhub_request('DELETE', f'/users/{username}/servers/{server}')
+     
 
 def parse_user(user):
     """
@@ -43,7 +49,7 @@ def parse_user(user):
     """
     result = user.copy()
     result['server'] = None
-    del result['servers']
+    # del result['servers']
     if has_server(user):
         result['server'] = list(user['servers'].items())[0][1]
     return result

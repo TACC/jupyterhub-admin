@@ -8,6 +8,7 @@ urlpatterns = [
     path('create/', views.create_group, name='create_group'),
     path('rename/', views.rename_group, name='rename_group'),
     path('delete/', views.delete_group, name='delete_group'),
+    path('stop/', views.stop_all_servers, name='stop_all_servers'),
     path('<str:group>/user/<str:index>', views.user, name='user'),
     path('<str:group>/images/<str:index>', views.images, name='images'),
     path('<str:group>/mounts/<str:index>', views.mounts, name='mounts'),

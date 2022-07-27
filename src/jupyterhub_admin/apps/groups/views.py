@@ -13,6 +13,7 @@ from django.contrib.auth.decorators import login_required
 import logging
 import json
 from jupyterhub_admin.apps.mounts.views import get_fields as get_mount_fields
+from jupyterhub_admin.jhub_api import stop_server, stop_specified_server, get_user
 
 
 logger = logging.getLogger(__name__)
@@ -101,6 +102,21 @@ def get_user_fields(user):
         }
     ]
 
+@login_required
+def stop_all_servers(request):
+    content = json.loads(request.body)
+    group = content['group']
+    meta = get_tapis_group_config_metadata(group)
+    users = meta['value']['user']
+    for username in users:
+        user = get_user(username)
+        if user['servers'] is not None:
+            for server in user['servers']:
+                stop_specified_server(username, server)
+        else:
+            stop_server(username)
+    url = reverse('groups:groups', args=[group])
+    return JsonResponse({ 'url': url})
 
 @login_required
 def user(request, group, index):
