@@ -20,6 +20,11 @@ logger = logging.getLogger(__name__)
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
+URL_PREFIX = os.environ.get('URL_PREFIX', '').rstrip('/')
+HOME = '/'
+if URL_PREFIX != '':
+    URL_PREFIX = '/' + URL_PREFIX
+    HOME = URL_PREFIX
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/3.2/howto/deployment/checklist/
@@ -88,11 +93,11 @@ ALLOWED_HOSTS = ['*']
 USE_X_FORWARDED_HOST = True
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
-LOGIN_URL = '/auth/tapis'
-LOGIN_REDIRECT_URL = '/'
+LOGIN_URL = f'{URL_PREFIX}/auth/tapis'
+LOGIN_REDIRECT_URL = f'{HOME}'
 
-STATIC_URL = '/static/'
-MEDIA_URL = '/media/'
+STATIC_URL = f'{URL_PREFIX}/static/'
+MEDIA_URL = f'{URL_PREFIX}/media/'
 
 STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
@@ -118,6 +123,7 @@ INSTALLED_APPS = [
     'jupyterhub_admin.apps.tapisauth',
     'jupyterhub_admin.apps.groups',
     'jupyterhub_admin.apps.links',
+    'jupyterhub_admin.apps.logdata',
 ]
 
 MIDDLEWARE = [

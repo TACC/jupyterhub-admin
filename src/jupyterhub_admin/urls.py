@@ -22,12 +22,13 @@ if url_prefix != '':
     url_prefix = url_prefix+'/'
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
-    path('jhub/', include('jupyterhub_admin.apps.jupyterhub.urls')),
-    path('images/', include('jupyterhub_admin.apps.images.urls')),
-    path('mounts/', include('jupyterhub_admin.apps.mounts.urls')),
-    path('groups/', include('jupyterhub_admin.apps.groups.urls')),
-    path('auth/', include('jupyterhub_admin.apps.tapisauth.urls')),
-    path('links/', include('jupyterhub_admin.apps.links.urls')),
-    path('', include('jupyterhub_admin.apps.main.urls'))
+    path(f'{url_prefix}admin/', admin.site.urls),
+    path(f'{url_prefix}jhub/', include('jupyterhub_admin.apps.jupyterhub.urls')),
+    path(f'{url_prefix}images/', include('jupyterhub_admin.apps.images.urls')),
+    path(f'{url_prefix}mounts/', include('jupyterhub_admin.apps.mounts.urls')),
+    path(f'{url_prefix}groups/', include('jupyterhub_admin.apps.groups.urls')),
+    path(f'{url_prefix}auth/', include('jupyterhub_admin.apps.tapisauth.urls')),
+    path(f'{url_prefix}links/', include('jupyterhub_admin.apps.links.urls')),
+    path(f'{url_prefix}logdata/', include('jupyterhub_admin.apps.logdata.urls')),
+    path(f'{url_prefix}', include('jupyterhub_admin.apps.main.urls'))
 ]
