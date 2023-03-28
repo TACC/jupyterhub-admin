@@ -5,6 +5,8 @@ from datetime import datetime
 import json
 import logging
 from collections import defaultdict
+import sys
+import gzip
 
 os.environ["DJANGO_SETTINGS_MODULE"] = "jupyterhub_admin.settings"
 django.setup()
@@ -113,7 +115,7 @@ class LogParser:
                 logger.exception(e)
                 return
         try:
-            with open(file, 'r') as logfile:
+            with gzip.open(file, 'rt') as logfile:
                 ParsedAccessLog.objects.filter(pk=filename).update(status='Opened')
                 logs = logfile.readlines()
                 for line_num, log in enumerate(logs, 1):
@@ -144,7 +146,7 @@ class LogParser:
                 error = logins_added if not logins_added == 'Added' else ''
             if success:
                 logger.info(f"{filename} -- Success")
-                ParsedAccessLog.objects.filter(pk=filename).update(status='Success')
+                ParsedAccessLog.objects.filter(pk=filename).update(status='Success', last_line_added=line_tracker)
                 files_successfully_parsed.append(file)
             else:
                 logger.info(f"{filename} -- Failed")
@@ -189,29 +191,31 @@ class LogParser:
         :param info: dictionary containg info from log
         :return: nothing, but update list of entries
         """
-        if info['action'] in ['created', 'opened']:
-            if not isinstance(info['user'], str):
+        if not isinstance(info['user'], str):
                 logger.error(f"NO USER FOUND: {info}")
                 return
+        user = info['ip_address'] if info['user'] == '' else info['user']
+        if info['action'] in ['created', 'opened']:
             self.file_entries_to_add.append(FileLog(
                     tenant=self.tenant,
-                    user=info['user'],
+                    user=user,
                     action=info['action'],
                     filepath=info['path'], 
                     filename=info['file'], 
                     date=info['date'], 
                     time=info['time'],
-                    raw_filepath=info['raw_filepath']
+                    raw_filepath=info['raw_filepath'],
+                    ip_address=info['ip_address'],
+                    system_info=info['system_info']
                 ))
         else:
-            if not isinstance(info['user'], str):
-                logger.error(f"NO USER FOUND: {info}")
-                return
             self.login_entries_to_add.append(LoginLog(
                     tenant=self.tenant,
-                    user=info['user'],
+                    user=user,
                     date=info['date'], 
                     time=info['time'],
+                    ip_address=info['ip_address'],
+                    system_info=info['system_info']
                 ))
 
     def set_home_path(self):
@@ -224,7 +228,7 @@ class LogParser:
             'tacc': '/home/jovyan',
             'designsafe': '/home/jupyter'
         }
-        return home_paths[self.tenant]
+        return home_paths.get(self.tenant, "")
 
     def set_symbolic_links(self):
         """
@@ -242,7 +246,7 @@ class LogParser:
                 '/home/jupyter/projects': '/home/jupyter/MyProjects'
             }
         }
-        return symbolic_links[self.tenant]
+        return symbolic_links.get(self.tenant, {})
 
     def set_tenant(self, log):
         """
@@ -251,10 +255,13 @@ class LogParser:
         :param log: current log in file
         :return: nothing, but update tenant
         """
-        if 'jupyter.tacc.cloud' in log:
+        split_log = re.split(r'\s' ,log)
+        if 'jupyter.tacc.cloud' in log or '/home/jovyan/' in split_log[6]:
             self.tenant = 'tacc'
-        elif 'jupyter.designsafe-ci.org' in log:
+        elif 'jupyter.designsafe-ci.org' in log or '/home/jupyter/' in split_log[6]:
             self.tenant = 'designsafe'
+
+        #logger.debug(self.tenant)
         self.home_path = self.set_home_path()
         self.symbolic_links = self.set_symbolic_links()
 
@@ -322,8 +329,9 @@ class LogParser:
         ]
         for network_path in network_paths:
             if network_path in path:
-                true_path = path.replace(network_path, self.home_path)
-                true_path = self.check_for_symbolic_link(true_path)
+                if self.home_path != "":
+                    true_path = path.replace(network_path, self.home_path)
+                    true_path = self.check_for_symbolic_link(true_path)
                 return true_path
         return path
 
@@ -367,6 +375,19 @@ class LogParser:
         date = dateobj.strftime('%Y-%m-%d')
         return {'date': date, 'time': time}
 
+    def get_system_info(self, split_log):
+        """
+        Get system info of request
+
+        :param split_log: current log split into an array
+        :return: system info
+        """
+        log = ' '.join(str(x) for x in split_log)
+        res = re.findall('"([^"]*)"', log)
+
+        system_info = res[2]
+        return system_info
+
     def get_info_from_log(self, split_log):
         """
         Change date to YYYY-MM-DD format
@@ -381,8 +402,10 @@ class LogParser:
         datetime_dict = self.get_date_time(split_log)
         date = datetime_dict['date']
         time = datetime_dict['time']
+        ip_address = split_log[0]
+        system_info = self.get_system_info(split_log)
 
-        return {'user': user, 'raw_filepath': raw_filepath, 'path': path, 'file': file, 'date': date, 'time': time}
+        return {'user': user, 'raw_filepath': raw_filepath, 'path': path, 'file': file, 'date': date, 'time': time, 'ip_address': ip_address, 'system_info': system_info}
 
     def parse_login_info(self, split_log):
         """
@@ -395,11 +418,14 @@ class LogParser:
         datetime_dict = self.get_date_time(split_log)
         date = datetime_dict['date']
         time = datetime_dict['time']
+        system_info = self.get_system_info(split_log)
         info = {
             'user': user,
             'date': date,
             'time': time,
-            'action': 'login'
+            'action': 'login',
+            'ip_address': split_log[0],
+            'system_info': system_info
         }
         insert = False
 

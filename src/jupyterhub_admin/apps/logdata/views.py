@@ -49,6 +49,7 @@ def index(request):
                 context['jhub_stats'] = True
                 context['queried'] = False
                 accessed_files = FileLog.objects.filter(tenant=tenant, date__range=(start_date, end_date))
+                directories_accessed = get_directories(accessed_files.values('filepath'))
                 created_files = accessed_files.filter(action='created')
                 opened_files = accessed_files.filter(action='opened')
                 num_created_files = created_files.count()
@@ -72,9 +73,36 @@ def index(request):
                 context['unique_login_count'] = unique_login_count
                 context['total_login_count'] = total_login_count
                 context['unique_user_count'] = unique_user_count
+                context['dirs'] = directories_accessed
                 context['queried'] = False
         except Exception as e:
             context['error'] = True
             context['message'] = e
 
         return HttpResponse(template.render(context, request))
+
+def get_directories(accessed_files):
+    filepaths = list(accessed_files)
+    logger.debug(f"Filepaths: {filepaths}")
+    dir_counts = {}
+    
+    for path in filepaths:
+        dir = path['filepath']
+        dir_counts[dir] = dir_counts.get(dir, 0) + 1
+
+    logger.debug(dir_counts)
+
+    dirs = []
+    for path in dir_counts.keys():
+        dir = path
+        count = dir_counts[path]
+        dir_count = {
+            'directory': dir,
+            'count': count
+        }
+        dirs.append(dir_count)
+
+    dirs = sorted(dirs, key=lambda d: d['count'], reverse=True) 
+
+    logger.debug(dirs)
+    return dirs

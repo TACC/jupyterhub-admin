@@ -97,6 +97,23 @@
         <h4>
             Number of Created Files: {{ num_created_files }}
         </h4>
+        
+        <table border=1 class="table">
+            <thead>
+                <tr>
+                    <th>Directory</th>
+                    <th>Count</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for dir in dirs %}
+                    <tr>
+                        <td>{{ dir.directory }}</td>
+                        <td>{{ dir.count }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
     {% endif %}
     
 {% endblock %}

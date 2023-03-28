@@ -5,14 +5,20 @@ from django.utils import timezone
 # Create your models here.
 
 
-class FileLog(models.Model):
+class Log(models.Model):
     tenant = models.CharField(max_length=255)
     user = models.CharField(max_length=255)
+    date = models.DateField()
+    time = models.TimeField()
+    ip_address = models.CharField(max_length=45, default='000.000.000.000')
+    system_info = models.TextField(default='')
+    class Meta:
+        abstract = True
+
+class FileLog(Log):
     action = models.CharField(max_length=255)
     filepath = models.TextField()
     filename = models.CharField(max_length=255)
-    date = models.DateField()
-    time = models.TimeField()
     raw_filepath = models.TextField()
 
     class Meta:
@@ -24,12 +30,7 @@ class FileLog(models.Model):
     def __str__(self):
         return self.tenant + " " + self.user + " " + self.action + " " + self.filepath + " " + self.filename + " " + str(self.date) + " " + str(self.time)
 
-class LoginLog(models.Model):
-    tenant = models.CharField(max_length=255)
-    user = models.CharField(max_length=255)
-    date = models.DateField()
-    time = models.TimeField()
-
+class LoginLog(Log):
     class Meta:
         unique_together = ['tenant', 'user', 'date', 'time']
 
