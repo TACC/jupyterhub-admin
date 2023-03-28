@@ -70,11 +70,11 @@ def send_email(plot_path, start_date, end_date, jupyterhub_stats):
     try:
         server = smtplib.SMTP(host, port)
         server.sendmail(sender_email, receiver_email, message.as_string())
-        print("SUCCESS")
+        logger.debug("EMAIL SENT")
         if os.path.isfile(plot_path):
             os.remove(plot_path)
     except Exception as e:
-        print(f'ERROR: {e}')
+        logger.debug(f'ERROR SENDING EMAIL: {e}')
 
 def create_graph(directories, counts):
     plt.bar(directories, counts, color='green')
@@ -96,7 +96,6 @@ def create_graph(directories, counts):
 
 def get_directories_and_counts(accessed_files):
     filepaths = list(accessed_files)
-    logger.debug(f"Filepaths: {filepaths}")
     dir_counts = {}
     directories = ['CommunityData', 'MyData', 'MyProjects', 'NEES', 'NHERI-Published']
 
@@ -105,9 +104,6 @@ def get_directories_and_counts(accessed_files):
         for d in directories:
             if d in dir:
                 dir_counts[d] = dir_counts.get(d, 0) + 1
-
-
-    logger.debug(dir_counts)
 
     directories = []
     counts = []
@@ -121,9 +117,6 @@ def get_directories_and_counts(accessed_files):
     counts = list(counts)
     directories.reverse()
     counts.reverse()
-
-    logger.debug(directories)
-    logger.debug(counts)
 
     return directories, counts
 
@@ -156,7 +149,7 @@ def generate_stats(accessed_files):
 
 today = date.date.today()
 week_begin = today - date.timedelta(days=6)
-accessed_files = FileLog.objects.filter(tenant='designsafe', date__range=('2023-03-13', today))
+accessed_files = FileLog.objects.filter(tenant='designsafe', date__range=(week_begin, today))
 directories, counts = get_directories_and_counts(accessed_files.values('filepath'))
 plot_path = create_graph(directories, counts)
 jupyterhub_stats = generate_stats(accessed_files)
