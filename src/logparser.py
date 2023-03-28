@@ -192,8 +192,8 @@ class LogParser:
         :return: nothing, but update list of entries
         """
         if not isinstance(info['user'], str):
-                logger.error(f"NO USER FOUND: {info}")
-                return
+            logger.error(f"NO USER FOUND: {info} -- SKIPPING")
+            return
         user = info['ip_address'] if info['user'] == '' else info['user']
         if info['action'] in ['created', 'opened']:
             self.file_entries_to_add.append(FileLog(
@@ -204,18 +204,14 @@ class LogParser:
                     filename=info['file'], 
                     date=info['date'], 
                     time=info['time'],
-                    raw_filepath=info['raw_filepath'],
-                    ip_address=info['ip_address'],
-                    system_info=info['system_info']
+                    raw_filepath=info['raw_filepath']
                 ))
         else:
             self.login_entries_to_add.append(LoginLog(
                     tenant=self.tenant,
                     user=user,
                     date=info['date'], 
-                    time=info['time'],
-                    ip_address=info['ip_address'],
-                    system_info=info['system_info']
+                    time=info['time']
                 ))
 
     def set_home_path(self):
@@ -261,7 +257,6 @@ class LogParser:
         elif 'jupyter.designsafe-ci.org' in log or '/home/jupyter/' in split_log[6]:
             self.tenant = 'designsafe'
 
-        #logger.debug(self.tenant)
         self.home_path = self.set_home_path()
         self.symbolic_links = self.set_symbolic_links()
 
@@ -375,19 +370,6 @@ class LogParser:
         date = dateobj.strftime('%Y-%m-%d')
         return {'date': date, 'time': time}
 
-    def get_system_info(self, split_log):
-        """
-        Get system info of request
-
-        :param split_log: current log split into an array
-        :return: system info
-        """
-        log = ' '.join(str(x) for x in split_log)
-        res = re.findall('"([^"]*)"', log)
-
-        system_info = res[2]
-        return system_info
-
     def get_info_from_log(self, split_log):
         """
         Change date to YYYY-MM-DD format
@@ -403,9 +385,8 @@ class LogParser:
         date = datetime_dict['date']
         time = datetime_dict['time']
         ip_address = split_log[0]
-        system_info = self.get_system_info(split_log)
 
-        return {'user': user, 'raw_filepath': raw_filepath, 'path': path, 'file': file, 'date': date, 'time': time, 'ip_address': ip_address, 'system_info': system_info}
+        return {'user': user, 'raw_filepath': raw_filepath, 'path': path, 'file': file, 'date': date, 'time': time, 'ip_address': ip_address}
 
     def parse_login_info(self, split_log):
         """
@@ -418,14 +399,12 @@ class LogParser:
         datetime_dict = self.get_date_time(split_log)
         date = datetime_dict['date']
         time = datetime_dict['time']
-        system_info = self.get_system_info(split_log)
         info = {
             'user': user,
             'date': date,
             'time': time,
             'action': 'login',
-            'ip_address': split_log[0],
-            'system_info': system_info
+            'ip_address': split_log[0]
         }
         insert = False
 

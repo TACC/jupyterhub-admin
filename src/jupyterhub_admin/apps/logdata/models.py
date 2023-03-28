@@ -10,8 +10,7 @@ class Log(models.Model):
     user = models.CharField(max_length=255)
     date = models.DateField()
     time = models.TimeField()
-    ip_address = models.CharField(max_length=45, default='000.000.000.000')
-    system_info = models.TextField(default='')
+    
     class Meta:
         abstract = True
 
