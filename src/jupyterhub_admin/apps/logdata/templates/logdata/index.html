@@ -8,6 +8,7 @@
   <link rel="stylesheet" href="">
   <link rel="stylesheet" href="">
 {% endblock %}
+<body>
 {% block content %}
     <h3>
     JupyterHub Log Data
@@ -164,7 +165,7 @@
         }
 
         csv_data = csv_data.join('\n');
-        //console.log(csv_data)
+        // console.log(csv_data)
 
         downloadCSVFile(csv_data);
 
@@ -191,3 +192,4 @@
         document.body.removeChild(temp_link);
     }
 </script>
+</body>
