@@ -24,10 +24,10 @@
         </a>
         <div class="dropdown-menu" aria-labelledby="navbarDropdown">
           <a
-            class="dropdown-item {% if request.resolver_match.app_name == 'groups' %}active{% endif %}"
-            href="{% url 'groups:index' %}"
+            class="dropdown-item {% if request.resolver_match.app_name == 'logdata' %}active{% endif %}"
+            href="{% url 'logdata:index' %}"
           >
-            User Groups
+            Hub Usage Data
           </a>
           <a
             class="dropdown-item {% if request.resolver_match.app_name == 'mounts' %}active{% endif %}"

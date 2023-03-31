@@ -121,9 +121,7 @@ INSTALLED_APPS = [
     'jupyterhub_admin.apps.images',
     'jupyterhub_admin.apps.mounts',
     'jupyterhub_admin.apps.tapisauth',
-    'jupyterhub_admin.apps.groups',
-    'jupyterhub_admin.apps.links',
-    'jupyterhub_admin.apps.logdata',
+    'jupyterhub_admin.apps.logdata'
 ]
 
 MIDDLEWARE = [

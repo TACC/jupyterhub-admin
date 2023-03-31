@@ -42,14 +42,13 @@ class LoginLog(Log):
 class ParsedAccessLog(models.Model):
     filename = models.CharField(max_length=255, primary_key=True)
     status = models.CharField(max_length=255)
-    last_line_added = models.IntegerField(default=0)
     error = models.TextField(default='')
     
     def saveparsedlog(self):
         self.save()
 
     def __str__(self):
-        return self.filename + " " + self.status + " " + str(self.last_line_added)
+        return self.filename + " " + self.status
 
 class Tenant(models.Model):
     tenant = models.CharField(max_length=255, primary_key=True)

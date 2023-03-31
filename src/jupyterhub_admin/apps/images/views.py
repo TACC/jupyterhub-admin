@@ -2,8 +2,8 @@ from django.http import HttpResponse
 from django.template import loader
 from django.urls import reverse
 from jupyterhub_admin.metadata import (
-    get_tapis_config_metadata,
-    write_tapis_config_metadata
+    get_config_metadata,
+    write_config_metadata
 )
 from django.contrib.auth.decorators import login_required
 import logging
@@ -40,7 +40,7 @@ def index(request):
         'images': []
     }
     try:
-        metadata = get_tapis_config_metadata()
+        metadata = get_config_metadata()
         context['images'] = metadata['value']['images']
     except Exception as e:
         context['error'] = True
@@ -60,7 +60,7 @@ def images(request, index):
         'api': reverse('images:api', args=[str(index)])
     }
     try:
-        metadata = get_tapis_config_metadata()
+        metadata = get_config_metadata()
         image = metadata['value']['images'][index]
         context['fields'] = get_fields(image)
         context['message'] = f"Configuration for {image['display_name']}"
@@ -92,7 +92,7 @@ def api(request, index):
         display_name = request.POST.get('display_name')
         image_name = request.POST.get('image_name')
         try:
-            metadata = get_tapis_config_metadata()
+            metadata = get_config_metadata()
             image = {
                 'display_name': display_name,
                 'name': image_name
@@ -102,7 +102,7 @@ def api(request, index):
             else:
                 index = int(index)
                 metadata['value']['images'][index] = image
-            write_tapis_config_metadata(metadata['value'])
+            write_config_metadata(metadata['value'])
             return HttpResponse("OK")
         except Exception as e:
             logger.exception(e)
@@ -111,9 +111,9 @@ def api(request, index):
     if request.method == 'DELETE':
         try:
             index = int(index)
-            metadata = get_tapis_config_metadata()
+            metadata = get_config_metadata()
             metadata['value']['images'].pop(index)
-            write_tapis_config_metadata(metadata['value'])
+            write_config_metadata(metadata['value'])
             return HttpResponse("OK")
         except Exception as e:
             logger.exception(e)

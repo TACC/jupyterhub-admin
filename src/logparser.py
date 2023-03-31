@@ -99,14 +99,11 @@ class LogParser:
             if status == 'Success':
                 logger.debug(f"{filename} exists -- skipping")
                 return
-            elif status == 'Opened' or status == 'Failed':
-                last_line_added = fileobj.last_line_added
         elif not file_exists:
             try:
                 ParsedAccessLog.objects.create(
                     filename = filename,
                     status = 'Queued',
-                    last_line_added = 0,
                     error = ''
                 )
             except Exception as e:
@@ -121,8 +118,6 @@ class LogParser:
                 for line_num, log in enumerate(logs, 1):
                     line_tracker = line_num
                     self.set_tenant(log)
-                    if line_num <= last_line_added:
-                        continue
                     split_log = re.split(r'\s' ,log)
                     request_type = split_log[5][1:]
                     request_status = split_log[8]
@@ -146,7 +141,7 @@ class LogParser:
                 error = logins_added if not logins_added == 'Added' else ''
             if success:
                 logger.info(f"{filename} -- Success")
-                ParsedAccessLog.objects.filter(pk=filename).update(status='Success', last_line_added=line_tracker)
+                ParsedAccessLog.objects.filter(pk=filename).update(status='Success')
                 files_successfully_parsed.append(file)
             else:
                 logger.info(f"{filename} -- Failed")
@@ -154,7 +149,6 @@ class LogParser:
                 files_failed_to_parse.append(file)
         except Exception as e:
             ParsedAccessLog.objects.filter(pk=filename).update(status='Failed', error=e)
-            ParsedAccessLog.objects.filter(pk=filename).update(last_line_added=line_tracker)
             files_failed_to_parse.append(file)
             logger.exception(e)
 

@@ -41,6 +41,7 @@ if tenant not in valid_tenants:
     sys.exit()
 
 tenant_config = Tenant.objects.get(pk=tenant)
+
 proper_name = tenant_config.proper_name
 temp_directories = tenant_config.tenantdirectory_set.all().values('directory')
 tenant_directories = []
@@ -70,7 +71,6 @@ def send_email(plot_path, week_begin, week_end, jupyterhub_stats):
         fp.close()
         message.attach(img)
 
-    link = str(os.environ['ADMIN_PORTAL_URL']) + '/logdata'
     html = """\
     <html>
         <body>
@@ -93,10 +93,9 @@ def send_email(plot_path, week_begin, week_end, jupyterhub_stats):
                 Number of Notebooks Created: """+str(jupyterhub_stats['num_created_files'])+"""
             </h4>
             <p><img src="cid:0"></p>
-            <p>To view more details, or view different dates, check out the <a href="%s">Admin Portal</a></p>
         </body>
     </html>
-    """ % (link)
+    """
     message.attach(MIMEText(html, 'html'))
 
     try:
@@ -154,9 +153,7 @@ def get_directories_and_counts(accessed_files):
 
 def generate_stats(accessed_files, week_begin, week_end):
     created_files = accessed_files.filter(action='created')
-    logger.debug(f'created_files: {created_files}')
     opened_files = accessed_files.filter(action='opened')
-    logger.debug(f'opened_files: {opened_files}')
     num_created_files = created_files.count()
     num_opened_files = opened_files.count()
     login_users = LoginLog.objects.filter(tenant=tenant, date__range=(week_begin, week_end))
