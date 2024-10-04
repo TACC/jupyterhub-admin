@@ -48,6 +48,10 @@ JUPYTERHUB_SERVER = os.environ.get('JUPYTERHUB_SERVER', None)
 if not JUPYTERHUB_SERVER:
     logger.warning("Missing JUPYTERHUB_API environment variable")
 
+REPORTER_LINK = os.environ.get('REPORTER_LINK', None)
+if not REPORTER_LINK:
+    logger.warning("Missing REPORTER_LINK environment variable")
+
 TENANT = os.environ.get('TENANT', None)
 if not TENANT:
     logger.warning("Missing TENANT environment variable")
@@ -120,8 +124,7 @@ INSTALLED_APPS = [
     'jupyterhub_admin.apps.main',
     'jupyterhub_admin.apps.images',
     'jupyterhub_admin.apps.mounts',
-    'jupyterhub_admin.apps.tapisauth',
-    'jupyterhub_admin.apps.logdata'
+    'jupyterhub_admin.apps.tapisauth'
 ]
 
 MIDDLEWARE = [

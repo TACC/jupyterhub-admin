@@ -25,8 +25,10 @@
 <ul>
   <li><a href="{% url 'mounts:index' %}">Hub Volume Mounts</a></li>
   <li><a href="{% url 'images:index' %}">Hub Images</a></li>
-  <li><a href="{% url 'logdata:index' %}">Hub Usage Data</a></li>
   <li><a href="{% url 'jupyterhub:index' %}">Hub Admin</a></li>
+  <li>
+    Link to NGINX Log Reporter: <a href="{{ reporter }}">{{ reporter }}</a>
+  </li>
 </ul>
 {% endblock %}
 {% block scripts %}

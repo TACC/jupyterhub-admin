@@ -23,7 +23,6 @@ urlpatterns = [
     path('jhub/', include('jupyterhub_admin.apps.jupyterhub.urls')),
     path('images/', include('jupyterhub_admin.apps.images.urls')),
     path('mounts/', include('jupyterhub_admin.apps.mounts.urls')),
-    path('logdata/', include('jupyterhub_admin.apps.logdata.urls')),
     path('auth/', include('jupyterhub_admin.apps.tapisauth.urls')),
     path('', include('jupyterhub_admin.apps.main.urls'))
 ]

@@ -9,6 +9,7 @@ def index(request):
     template = loader.get_template("main/index.html")
     context = {
         'name': f"{settings.TENANT}.{settings.INSTANCE}",
-        'server': settings.JUPYTERHUB_SERVER
+        'server': settings.JUPYTERHUB_SERVER,
+        'reporter': settings.REPORTER_LINK
     }
     return HttpResponse(template.render(context, request))
